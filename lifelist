@@ -1,0 +1,3 @@
+hciconfig hci0 up
+hcitool lescan
+
