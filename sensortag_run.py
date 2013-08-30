@@ -22,7 +22,7 @@
 import pexpect
 import sys
 import time
-from sensor_calcs import *
+from sensortag_funcs import *
 import json
 import select
 
