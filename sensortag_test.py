@@ -1,19 +1,17 @@
 #!/usr/bin/env python
+#
 # Michael Saunby. April 2013   
+# Thomas Ackermann, August 2013
+#
+# Usage:
+#  sensortag_test.py BLUETOOTH_ADR
 # 
 # Read temperature from the TMP006 sensor in the TI SensorTag 
-# It's a BLE (Bluetooth low energy) device so using gatttool to
+# It's a BLE (Bluetooth low energy) device so use gatttool to
 # read and write values. 
-#
-# Usage.
-# sensortag_test.py BLUETOOTH_ADR
 #
 # To find the address of your SensorTag run 'sudo hcitool lescan'
 # You'll need to press the side button to enable discovery.
-#
-# Notes.
-# pexpect uses regular expression so characters that have special meaning
-# in regular expressions, e.g. [ and ] must be escaped with a backslash.
 #
 
 import pexpect
@@ -27,12 +25,11 @@ def floatfromhex(h):
         pass
     return t
 
-
 # This algorithm borrowed from 
 # http://processors.wiki.ti.com/index.php/SensorTag_User_Guide#Gatt_Server
 # which most likely took it from the datasheet.  I've not checked it, other
 # than noted that the temperature values I got seemed reasonable.
-#
+
 def calcTmpTarget(objT, ambT):
     m_tmpAmb = ambT/128.0
     Vobj2 = objT * 0.00000015625
@@ -50,26 +47,31 @@ def calcTmpTarget(objT, ambT):
     fObj = (Vobj2 - Vos) + c2*pow((Vobj2 - Vos),2)
     tObj = pow(pow(Tdie2,4) + (fObj/S),.25)
     tObj = (tObj - 273.15)
-    print "%.2f C" % tObj
-
+    print "IRTMP %.2f C" % tObj
+    print "AMTMP %.2f C" % m_tmpAmb
 
 bluetooth_adr = sys.argv[1]
-tool = pexpect.spawn('gatttool -b ' + bluetooth_adr + ' --interactive')
+tool = pexpect.spawn('gatttool54 -b ' + bluetooth_adr + ' --interactive')
 tool.expect('\[LE\]>')
 print "Preparing to connect. You might need to press the side button..."
 tool.sendline('connect')
-# test for success of connect
 tool.expect('\[CON\].*>')
+
 tool.sendline('char-write-cmd 0x29 01')
 tool.expect('\[LE\]>')
+# wait a second for the sensor to become ready
+time.sleep(1)
+
+cnt = 0
+
 while True:
-    time.sleep(1)
+    cnt = cnt + 1
+    print "CNT %d" % cnt
     tool.sendline('char-read-hnd 0x25')
     tool.expect('descriptor: .*') 
     rval = tool.after.split()
     objT = floatfromhex(rval[2] + rval[1])
     ambT = floatfromhex(rval[4] + rval[3])
-    #print rval
     calcTmpTarget(objT, ambT)
-
+    time.sleep(30)
 
