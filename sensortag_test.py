@@ -1,54 +1,38 @@
 #!/usr/bin/env python
+
 #
-# Michael Saunby. April 2013   
-# Thomas Ackermann, August 2013
+# Copyright 2013 Michael Saunby
+# Copyright 2013 Thomas Ackermann
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
 #
 # Usage:
 #  sensortag_test.py BLUETOOTH_ADR
 # 
 # Read temperature from the TMP006 sensor in the TI SensorTag 
-# It's a BLE (Bluetooth low energy) device so use gatttool to
-# read and write values. 
+# It's a BLE (Bluetooth low energy) device so use gatttool (from bluez V5.4)
+# to read and write values. 
 #
 # To find the address of your SensorTag run 'sudo hcitool lescan'
 # You'll need to press the side button to enable discovery.
 #
 
-import pexpect
 import sys
 import time
-
-def floatfromhex(h):
-    t = float.fromhex(h)
-    if t > float.fromhex('7FFF'):
-        t = -(float.fromhex('FFFF') - t)
-        pass
-    return t
-
-# This algorithm borrowed from 
-# http://processors.wiki.ti.com/index.php/SensorTag_User_Guide#Gatt_Server
-# which most likely took it from the datasheet.  I've not checked it, other
-# than noted that the temperature values I got seemed reasonable.
-
-def calcTmpTarget(objT, ambT):
-    m_tmpAmb = ambT/128.0
-    Vobj2 = objT * 0.00000015625
-    Tdie2 = m_tmpAmb + 273.15
-    S0 = 6.4E-14            # Calibration factor
-    a1 = 1.75E-3
-    a2 = -1.678E-5
-    b0 = -2.94E-5
-    b1 = -5.7E-7
-    b2 = 4.63E-9
-    c2 = 13.4
-    Tref = 298.15
-    S = S0*(1+a1*(Tdie2 - Tref)+a2*pow((Tdie2 - Tref),2))
-    Vos = b0 + b1*(Tdie2 - Tref) + b2*pow((Tdie2 - Tref),2)
-    fObj = (Vobj2 - Vos) + c2*pow((Vobj2 - Vos),2)
-    tObj = pow(pow(Tdie2,4) + (fObj/S),.25)
-    tObj = (tObj - 273.15)
-    print "IRTMP %.2f C" % tObj
-    print "AMTMP %.2f C" % m_tmpAmb
+import pexpect
+from sensortag_funcs import *
 
 bluetooth_adr = sys.argv[1]
 tool = pexpect.spawn('gatttool54 -b ' + bluetooth_adr + ' --interactive')
@@ -72,6 +56,6 @@ while True:
     rval = tool.after.split()
     objT = floatfromhex(rval[2] + rval[1])
     ambT = floatfromhex(rval[4] + rval[3])
-    calcTmpTarget(objT, ambT)
+    print "IRTMP %.2f C" % calcIRTmpTarget(objT, ambT)
+    print "AMTMP %.2f C" % calcAmbTmpTarget(objT, ambT)
     time.sleep(30)
-

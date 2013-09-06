@@ -1,32 +1,45 @@
 #
-# Michael Saunby. April 2013   
-# 
-# Read temperature from the TMP006 sensor in the TI SensorTag.
+# Copyright 2013 Michael Saunby
+# Copyright 2013 Thomas Ackermann
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
 
-# This algorithm borrowed from 
+#
+# All these algorithms are borrowed from 
 # http://processors.wiki.ti.com/index.php/SensorTag_User_Guide#Gatt_Server
-# which most likely took it from the datasheet.  I've not checked it, other
-# than noted that the temperature values I got seemed reasonable.
+# which most likely took it from the datasheet. 
 #
-#   Copyright 2013 Michael Saunby
-#
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-#
-#       http://www.apache.org/licenses/LICENSE-2.0
-#
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
 
+def floatfromhex(h):
+    t = float.fromhex(h)
+    if t > float.fromhex('7FFF'):
+        t = -(float.fromhex('FFFF') - t)
+        pass
+    return t
 
 tosigned = lambda n: float(n-0x10000) if n>0x7fff else float(n)
 tosignedbyte = lambda n: float(n-0x100) if n>0x7f else float(n)
 
-def calcTmpTarget(objT, ambT):
+def calcAmbTmpTarget(objT, ambT):
+        
+    objT = tosigned(objT)
+    ambT = tosigned(ambT)
+
+    m_tmpAmb = ambT/128.0
+    return m_tmpAmb
+
+def calcIRTmpTarget(objT, ambT):
         
     objT = tosigned(objT)
     ambT = tosigned(ambT)
@@ -49,9 +62,6 @@ def calcTmpTarget(objT, ambT):
     tObj = (tObj - 273.15)
     return tObj
 
-#
-# Again from http://processors.wiki.ti.com/index.php/SensorTag_User_Guide#Gatt_Server
-#
 def calcHum(rawT, rawH):
     # -- calculate temperature [deg C] --
     t = -46.85 + 175.72/65536.0 * rawT
@@ -61,11 +71,11 @@ def calcHum(rawT, rawH):
     rh = -6.0 + 125.0/65536.0 * rawH # RH= -6 + 125 * SRH/2^16
     return (t, rh)
 
-
 #
-# Again from http://processors.wiki.ti.com/index.php/SensorTag_User_Guide#Gatt_Server
+# From http://processors.wiki.ti.com/index.php/SensorTag_User_Guide#Gatt_Server
 # but combining all three values and giving magnitude.
 # Magnitude tells us if we are at rest, falling, etc.
+#
 
 def calcAccel(rawX, rawY, rawZ):
     accel = lambda v: tosignedbyte(v) / 64.0  # Range -2G, +2G
@@ -73,16 +83,14 @@ def calcAccel(rawX, rawY, rawZ):
     mag = (xyz[0]**2 + xyz[1]**2 + xyz[2]**2)**0.5
     return (xyz, mag)
 
-
 #
-# Again from http://processors.wiki.ti.com/index.php/SensorTag_User_Guide#Gatt_Server
+# From http://processors.wiki.ti.com/index.php/SensorTag_User_Guide#Gatt_Server
 # but combining all three values.
 #
 
 def calcMagn(rawX, rawY, rawZ):
     magforce = lambda v: (tosigned(v) * 1.0) / (65536.0/2000.0)
     return [magforce(rawX),magforce(rawY),magforce(rawZ)]
-
 
 class Barometer:
 
@@ -106,7 +114,7 @@ class Barometer:
         temp += (val >> 10)
         return float(temp) / 100.0
 
-
+#
 # Conversion algorithm for barometer pressure (hPa)
 # 
 # Formula from application note, rev_X:
@@ -136,7 +144,6 @@ class Barometer:
     # Pressure (Pa)
         pres = ((s * Pr) + o) >> 14
         return float(pres)/100.0
-    
 
     class Calib:
 
@@ -154,8 +161,7 @@ class Barometer:
             self.c6 = tosigned(self.bld_int(pData[10],pData[11]))
             self.c7 = tosigned(self.bld_int(pData[12],pData[13]))
             self.c8 = tosigned(self.bld_int(pData[14],pData[15]))
-            
-
+ 
     def __init__(self, rawCalibration):
         self.m_barCalib = self.Calib( rawCalibration )
         return
@@ -166,5 +172,3 @@ class Barometer:
         bar_temp = self.calcBarTmp( self.m_raw_temp )
         bar_pres = self.calcBarPress( self.m_raw_temp, self.m_raw_pres )
         return( bar_temp, bar_pres)
-
-        
