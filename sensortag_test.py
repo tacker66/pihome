@@ -18,15 +18,14 @@
 #
 
 #
-# Usage:
-#  sensortag_test.py BLUETOOTH_ADR
-# 
-# Read temperature from the TMP006 sensor in the TI SensorTag 
-# It's a BLE (Bluetooth low energy) device so use gatttool (from bluez V5.4)
-# to read and write values. 
+# Read several sensors from the TI SensorTag. 
+# It's a BLE (Bluetooth low energy) device so we 
+# use gatttool (from bluez V5.4) to read and write values. 
+#
+# Usage: sensortag_test.py BLUETOOTH_ADR
 #
 # To find the address of your SensorTag run 'sudo hcitool lescan'
-# You'll need to press the side button to enable discovery.
+# To power up your bluetooth dongle run 'sudo hciconfig hci0 up'
 #
 
 import sys
@@ -34,28 +33,76 @@ import time
 import pexpect
 from sensortag_funcs import *
 
-bluetooth_adr = sys.argv[1]
-tool = pexpect.spawn('gatttool54 -b ' + bluetooth_adr + ' --interactive')
+# start gatttool
+adr = sys.argv[1]
+tool = pexpect.spawn('gatttool54 -b ' + adr + ' --interactive')
 tool.expect('\[LE\]>')
-print "Preparing to connect. You might need to press the side button..."
+
+# connect to SensorTag
+print adr, " Trying to connect. You might need to press the side button ..."
 tool.sendline('connect')
 tool.expect('\[CON\].*>')
 
+print adr, " Enabling sensors ..."
+# enable temperature sensor
 tool.sendline('char-write-cmd 0x29 01')
 tool.expect('\[LE\]>')
-# wait a second for the sensor to become ready
+
+# enable humidity sensor
+tool.sendline('char-write-cmd 0x3c 01')
+tool.expect('\[LE\]>')
+
+# enable barometric pressure sensor
+tool.sendline('char-write-cmd 0x4f 02')
+tool.expect('\[LE\]>')
+tool.sendline('char-read-hnd 0x52')
+tool.expect('descriptor: .* \r')
+after = tool.after
+v = after.split()[1:] 
+vals = [long(float.fromhex(n)) for n in v]
+barometer = Barometer( vals )
+tool.sendline('char-write-cmd 0x4f 01')
+tool.expect('\[LE\]>')
+
+# wait for the sensors to become ready
 time.sleep(1)
 
 cnt = 0
-
 while True:
+
     cnt = cnt + 1
-    print "CNT %d" % cnt
+    print adr, " CNT %d" % cnt
+
+    # read temperature sensor
     tool.sendline('char-read-hnd 0x25')
-    tool.expect('descriptor: .*') 
-    rval = tool.after.split()
-    objT = floatfromhex(rval[2] + rval[1])
-    ambT = floatfromhex(rval[4] + rval[3])
-    print "IRTMP %.2f C" % calcIRTmpTarget(objT, ambT)
-    print "AMTMP %.2f C" % calcAmbTmpTarget(objT, ambT)
+    tool.expect('descriptor: .* \r') 
+    v = tool.after.split()
+    rawObjT = long(float.fromhex(v[2] + v[1]))
+    rawAmbT = long(float.fromhex(v[4] + v[3]))
+    (at, it) = calcTmp(rawAmbT, rawObjT)
+
+    # read humidity sensor
+    tool.sendline('char-read-hnd 0x38')
+    tool.expect('descriptor: .* \r') 
+    v = tool.after.split()
+    rawT = long(float.fromhex(v[2] + v[1]))
+    rawH = long(float.fromhex(v[4] + v[3]))
+    (ht, h) = calcHum(rawT, rawH)
+
+    # read barometric pressure sensor
+    tool.sendline('char-read-hnd 0x4B')
+    tool.expect('descriptor: .* \r') 
+    v = tool.after.split()
+    rawT = long(float.fromhex(v[2] + v[1]))
+    rawP = long(float.fromhex(v[4] + v[3]))
+    (pt, p) = barometer.calc(rawT, rawP)
+
+    print adr, " IRTMP %.1f" % it
+    print adr, " AMTMP %.1f" % at
+    print adr, " HMTMP %.1f" % ht
+    print adr, " BRTMP %.1f" % pt
+    print adr, " HUMID %.0f" % h
+    print adr, " BAROM %.0f" % p
+    
     time.sleep(30)
+

@@ -21,29 +21,12 @@
 # which most likely took it from the datasheet. 
 #
 
-def floatfromhex(h):
-    t = float.fromhex(h)
-    if t > float.fromhex('7FFF'):
-        t = -(float.fromhex('FFFF') - t)
-        pass
-    return t
-
 tosigned = lambda n: float(n-0x10000) if n>0x7fff else float(n)
 tosignedbyte = lambda n: float(n-0x100) if n>0x7f else float(n)
 
-def calcAmbTmpTarget(objT, ambT):
-        
-    objT = tosigned(objT)
+def calcTmp(ambT, objT):
     ambT = tosigned(ambT)
-
-    m_tmpAmb = ambT/128.0
-    return m_tmpAmb
-
-def calcIRTmpTarget(objT, ambT):
-        
     objT = tosigned(objT)
-    ambT = tosigned(ambT)
-
     m_tmpAmb = ambT/128.0
     Vobj2 = objT * 0.00000015625
     Tdie2 = m_tmpAmb + 273.15
@@ -60,12 +43,11 @@ def calcIRTmpTarget(objT, ambT):
     fObj = (Vobj2 - Vos) + c2*pow((Vobj2 - Vos),2)
     tObj = pow(pow(Tdie2,4) + (fObj/S),.25)
     tObj = (tObj - 273.15)
-    return tObj
+    return (m_tmpAmb, tObj)
 
 def calcHum(rawT, rawH):
     # -- calculate temperature [deg C] --
     t = -46.85 + 175.72/65536.0 * rawT
-
     rawH = float(int(rawH) & ~0x0003); # clear bits [1..0] (status bits)
     # -- calculate relative humidity [%RH] --
     rh = -6.0 + 125.0/65536.0 * rawH # RH= -6 + 125 * SRH/2^16
@@ -104,7 +86,6 @@ class Barometer:
 #  c1 - c4: unsigned 16-bit integers
 #  c5 - c8: signed 16-bit integers
 #
-
     def calcBarTmp(self, raw_temp):
         c1 = self.m_barCalib.c1
         c2 = self.m_barCalib.c2
@@ -129,21 +110,32 @@ class Barometer:
         c6 = self.m_barCalib.c6
         c7 = self.m_barCalib.c7
         c8 = self.m_barCalib.c8
-    # Sensitivity
+        # Sensitivity
         s = long(c3)
         val = long(c4 * Tr)
         s += (val >> 17)
         val = long(c5 * Tr * Tr)
         s += (val >> 34)
-    # Offset
+        # Offset
         o = long(c6) << 14
         val = long(c7 * Tr)
         o += (val >> 3)
         val = long(c8 * Tr * Tr)
         o += (val >> 19)
-    # Pressure (Pa)
+        # Pressure (Pa)
         pres = ((s * Pr) + o) >> 14
         return float(pres)/100.0
+
+    def calc(self,  rawT, rawP):
+        self.m_raw_temp = tosigned(rawT)
+        self.m_raw_pres = rawP # N.B.  Unsigned value
+        bar_temp = self.calcBarTmp( self.m_raw_temp )
+        bar_pres = self.calcBarPress( self.m_raw_temp, self.m_raw_pres )
+        return( bar_temp, bar_pres)
+ 
+    def __init__(self, rawCalibration):
+        self.m_barCalib = self.Calib( rawCalibration )
+        return
 
     class Calib:
 
@@ -161,14 +153,4 @@ class Barometer:
             self.c6 = tosigned(self.bld_int(pData[10],pData[11]))
             self.c7 = tosigned(self.bld_int(pData[12],pData[13]))
             self.c8 = tosigned(self.bld_int(pData[14],pData[15]))
- 
-    def __init__(self, rawCalibration):
-        self.m_barCalib = self.Calib( rawCalibration )
-        return
 
-    def calc(self,  rawT, rawP):
-        self.m_raw_temp = tosigned(rawT)
-        self.m_raw_pres = rawP # N.B.  Unsigned value
-        bar_temp = self.calcBarTmp( self.m_raw_temp )
-        bar_pres = self.calcBarPress( self.m_raw_temp, self.m_raw_pres )
-        return( bar_temp, bar_pres)
