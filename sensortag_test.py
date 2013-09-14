@@ -103,6 +103,15 @@ while True:
     print adr, " BRTMP %.1f" % pt
     print adr, " HUMID %.0f" % h
     print adr, " BAROM %.0f" % p
-    
+
+    data = open("/home/pi/tmp/pihome/"+adr, "w")
+    data.write("IRTMP %.1f\n" % it)
+    data.write("AMTMP %.1f\n" % at)
+    data.write("HMTMP %.1f\n" % ht)
+    data.write("BRTMP %.1f\n" % pt)
+    data.write("HUMID %.0f\n" % h)
+    data.write("BAROM %.0f\n" % p)
+    data.close()
+
     time.sleep(30)
 

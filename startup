@@ -1,4 +1,8 @@
+#
+mkdir -p /home/pi/tmp/pihome
+#
 sudo ./sensortag_test.py BC:6A:29:C3:6A:D0 &
+#
 sleep 10
 sudo ./sensortag_test.py BC:6A:29:AB:EC:A8 &
-
+#
