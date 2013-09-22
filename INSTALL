@@ -1,0 +1,18 @@
+
+Install BlueZ 5.9:
+------------------
+wget https://www.kernel.org/pub/linux/bluetooth/bluez-5.9.tar.xz
+tar xvf bluez-5.9.tar.xz
+sudo apt-get install libdbus-1-dev libglib2.0-dev automake libudev-dev libical-dev libreadline-dev
+cd bluez-5.9
+./configure --disable-systemd
+make
+sudo make install
+sudo cp attrib/gatttool /usr/local/bin/gatttool59
+
+Install pexpect 3.0 (?):
+------------------------
+
+Install xively-python:
+----------------------
+
