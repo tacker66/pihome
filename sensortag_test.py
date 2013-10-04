@@ -18,9 +18,10 @@
 #
 
 #
-# Read several sensors from the TI SensorTag. 
-# It's a BLE (Bluetooth low energy) device so we 
-# use gatttool (from bluez V5.4) to read and write values. 
+# Read sensors from the TI SensorTag. It's a
+# BLE (Bluetooth low energy) device so by
+# automating gatttool (from BlueZ 5.9) with
+# pexpect we are able to read and write values.
 #
 # Usage: sensortag_test.py BLUETOOTH_ADR
 #
@@ -35,13 +36,17 @@ from sensortag_funcs import *
 
 # start gatttool
 adr = sys.argv[1]
-tool = pexpect.spawn('gatttool54 -b ' + adr + ' --interactive')
+tool = pexpect.spawn('gatttool59 -b ' + adr + ' --interactive')
 tool.expect('\[LE\]>')
+
+# bug in pexpect? automating gatttool works only if we are using a logfile!
+logfile = open("/dev/null", "w")
+tool.logfile = logfile
 
 # connect to SensorTag
 print adr, " Trying to connect. You might need to press the side button ..."
 tool.sendline('connect')
-tool.expect('\[CON\].*>')
+tool.expect('\[LE\]>')
 
 print adr, " Enabling sensors ..."
 # enable temperature sensor
@@ -55,8 +60,10 @@ tool.expect('\[LE\]>')
 # enable barometric pressure sensor
 tool.sendline('char-write-cmd 0x4f 02')
 tool.expect('\[LE\]>')
+
 tool.sendline('char-read-hnd 0x52')
-tool.expect('descriptor: .* \r')
+tool.expect('descriptor: .*? \r')
+
 after = tool.after
 v = after.split()[1:] 
 vals = [long(float.fromhex(n)) for n in v]
@@ -75,7 +82,7 @@ while True:
 
     # read temperature sensor
     tool.sendline('char-read-hnd 0x25')
-    tool.expect('descriptor: .* \r') 
+    tool.expect('descriptor: .*? \r') 
     v = tool.after.split()
     rawObjT = long(float.fromhex(v[2] + v[1]))
     rawAmbT = long(float.fromhex(v[4] + v[3]))
@@ -83,7 +90,7 @@ while True:
 
     # read humidity sensor
     tool.sendline('char-read-hnd 0x38')
-    tool.expect('descriptor: .* \r') 
+    tool.expect('descriptor: .*? \r') 
     v = tool.after.split()
     rawT = long(float.fromhex(v[2] + v[1]))
     rawH = long(float.fromhex(v[4] + v[3]))
@@ -91,7 +98,7 @@ while True:
 
     # read barometric pressure sensor
     tool.sendline('char-read-hnd 0x4B')
-    tool.expect('descriptor: .* \r') 
+    tool.expect('descriptor: .*? \r') 
     v = tool.after.split()
     rawT = long(float.fromhex(v[2] + v[1]))
     rawP = long(float.fromhex(v[4] + v[3]))
