@@ -1,201 +1,123 @@
 #!/usr/bin/env python
-# Michael Saunby. April 2013
-#
-# Notes.
-# pexpect uses regular expression so characters that have special meaning
-# in regular expressions, e.g. [ and ] must be escaped with a backslash.
-#
-#   Copyright 2013 Michael Saunby
-#
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-#
-#       http://www.apache.org/licenses/LICENSE-2.0
-#
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
 
-import pexpect
+#
+# Copyright 2013 Michael Saunby
+# Copyright 2013 Thomas Ackermann
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+#
+# Read sensors from the TI SensorTag. It's a
+# BLE (Bluetooth low energy) device so by
+# automating gatttool (from BlueZ 5.9) with
+# pexpect we are able to read and write values.
+#
+# Usage: sensortag_test.py BLUETOOTH_ADR
+#
+# To find the address of your SensorTag run 'sudo hcitool lescan'
+# To power up your bluetooth dongle run 'sudo hciconfig hci0 up'
+#
+
 import sys
 import time
+import pexpect
 from sensortag_funcs import *
-import json
-import select
 
-def floatfromhex(h):
-    t = float.fromhex(h)
-    if t > float.fromhex('7FFF'):
-        t = -(float.fromhex('FFFF') - t)
-        pass
-    return t
+# start gatttool
+adr = sys.argv[1]
+tool = pexpect.spawn('gatttool59 -b ' + adr + ' --interactive')
+tool.expect('\[LE\]>')
 
-class SensorTag:
+# bug in pexpect? automating gatttool works only if we are using a logfile!
+logfile = open("/dev/null", "w")
+tool.logfile = logfile
 
-    def __init__( self, bluetooth_adr ):
-        self.con = pexpect.spawn('gatttool -b ' + bluetooth_adr + ' --interactive')
-        self.con.expect('\[LE\]>', timeout=600)
-        print "Preparing to connect. You might need to press the side button..."
-        self.con.sendline('connect')
-        # test for success of connect
-        self.con.expect('\[CON\].*>')
-        self.cb = {}
-        return
+# connect to SensorTag
+print adr, " Trying to connect. You might need to press the side button ..."
+tool.sendline('connect')
+tool.expect('\[LE\]>')
 
-    def char_write_cmd( self, handle, value ):
-        # The 0%x for value is VERY naughty!  Fix this!
-        cmd = 'char-write-cmd 0x%02x 0%x' % (handle, value)
-        print cmd
-        self.con.sendline( cmd )
-        return
+print adr, " Enabling sensors ..."
+# enable temperature sensor
+tool.sendline('char-write-cmd 0x29 01')
+tool.expect('\[LE\]>')
 
-    def char_read_hnd( self, handle ):
-        self.con.sendline('char-read-hnd 0x%02x' % handle)
-        self.con.expect('descriptor: .*? \r')
-        after = self.con.after
-        rval = after.split()[1:]
-        return [long(float.fromhex(n)) for n in rval]
+# enable humidity sensor
+tool.sendline('char-write-cmd 0x3c 01')
+tool.expect('\[LE\]>')
 
-    # Notification handle = 0x0025 value: 9b ff 54 07
-    def notification_loop( self ):
-        while True:
-	    try:
-              pnum = self.con.expect('Notification handle = .*? \r', timeout=4)
-            except pexpect.TIMEOUT:
-              print "TIMEOUT exception!"
-              break
-	    if pnum==0:
-                after = self.con.after
-	        hxstr = after.split()[3:]
-            	handle = long(float.fromhex(hxstr[0]))
-            	#try:
-	        if True:
-                  self.cb[handle]([long(float.fromhex(n)) for n in hxstr[2:]])
-            	#except:
-                #  print "Error in callback for %x" % handle
-                #  print sys.argv[1]
-                pass
-            else:
-              print "TIMEOUT!!"
-        pass
+# enable barometric pressure sensor
+tool.sendline('char-write-cmd 0x4f 02')
+tool.expect('\[LE\]>')
 
-    def register_cb( self, handle, fn ):
-        self.cb[handle]=fn;
-        return
+tool.sendline('char-read-hnd 0x52')
+tool.expect('descriptor: .*? \r')
 
-barometer = None
-datalog = sys.stdout
+after = tool.after
+v = after.split()[1:] 
+vals = [long(float.fromhex(n)) for n in v]
+barometer = Barometer( vals )
+tool.sendline('char-write-cmd 0x4f 01')
+tool.expect('\[LE\]>')
 
-class SensorCallbacks:
+# wait for the sensors to become ready
+time.sleep(1)
 
-    data = {}
+cnt = 0
+while True:
 
-    def __init__(self,addr):
-        self.data['addr'] = addr
+    cnt = cnt + 1
+    print adr, " CNT %d" % cnt
 
-    def tmp006(self,v):
-        objT = (v[1]<<8)+v[0]
-        ambT = (v[3]<<8)+v[2]
-        targetT = calcTmpTarget(objT, ambT)
-        self.data['t006'] = targetT
-        print "T006 %.1f" % targetT
+    # read temperature sensor
+    tool.sendline('char-read-hnd 0x25')
+    tool.expect('descriptor: .*? \r') 
+    v = tool.after.split()
+    rawObjT = long(float.fromhex(v[2] + v[1]))
+    rawAmbT = long(float.fromhex(v[4] + v[3]))
+    (at, it) = calcTmp(rawAmbT, rawObjT)
 
-    def accel(self,v):
-        (xyz,mag) = calcAccel(v[0],v[1],v[2])
-        self.data['accl'] = xyz
-        print "ACCL", xyz
+    # read humidity sensor
+    tool.sendline('char-read-hnd 0x38')
+    tool.expect('descriptor: .*? \r') 
+    v = tool.after.split()
+    rawT = long(float.fromhex(v[2] + v[1]))
+    rawH = long(float.fromhex(v[4] + v[3]))
+    (ht, h) = calcHum(rawT, rawH)
 
-    def humidity(self, v):
-        rawT = (v[1]<<8)+v[0]
-        rawH = (v[3]<<8)+v[2]
-        (t, rh) = calcHum(rawT, rawH)
-        self.data['humd'] = [t, rh]
-        print "HUMD %.1f" % rh
+    # read barometric pressure sensor
+    tool.sendline('char-read-hnd 0x4B')
+    tool.expect('descriptor: .*? \r') 
+    v = tool.after.split()
+    rawT = long(float.fromhex(v[2] + v[1]))
+    rawP = long(float.fromhex(v[4] + v[3]))
+    (pt, p) = barometer.calc(rawT, rawP)
 
-    def baro(self,v):
-        global barometer
-        global datalog
-        rawT = (v[1]<<8)+v[0]
-        rawP = (v[3]<<8)+v[2]
-        (temp, pres) =  self.data['baro'] = barometer.calc(rawT, rawP)
-        print "BARO", temp, pres
-        self.data['time'] = long(time.time() * 1000);
-        # The socket or output file might not be writeable
-        # check with select so we don't block.
-        (re,wr,ex) = select.select([],[datalog],[],0)
-        if len(wr) > 0:
-            datalog.write(json.dumps(self.data) + "\n")
-            datalog.flush()
-            pass
+    print adr, " IRTMP %.1f" % it
+    print adr, " AMTMP %.1f" % at
+    print adr, " HMTMP %.1f" % ht
+    print adr, " BRTMP %.1f" % pt
+    print adr, " HUMID %.0f" % h
+    print adr, " BAROM %.0f" % p
 
-    def magnet(self,v):
-        x = (v[1]<<8)+v[0]
-        y = (v[3]<<8)+v[2]
-        z = (v[5]<<8)+v[4]
-        xyz = calcMagn(x, y, z)
-        self.data['magn'] = xyz
-        print "MAGN", xyz
+    data = open("/home/pi/tmp/pihome/"+adr, "w")
+    data.write("IRTMP %.1f\n" % it)
+    data.write("AMTMP %.1f\n" % at)
+    data.write("HMTMP %.1f\n" % ht)
+    data.write("BRTMP %.1f\n" % pt)
+    data.write("HUMID %.0f\n" % h)
+    data.write("BAROM %.0f\n" % p)
+    data.close()
 
-    def gyro(self,v):
-        print "GYRO", v
-
-def main():
-    global datalog
-    global barometer
-
-    bluetooth_adr = sys.argv[1]
-    #data['addr'] = bluetooth_adr
-    if len(sys.argv) > 2:
-        datalog = open(sys.argv[2], 'w+')
-
-    while True:
-     try:   
-      print "[re]starting.."
-
-      tag = SensorTag(bluetooth_adr)
-      cbs = SensorCallbacks(bluetooth_adr)
-
-      # enable TMP006 sensor
-      tag.register_cb(0x25,cbs.tmp006)
-      tag.char_write_cmd(0x29,0x01)
-      tag.char_write_cmd(0x26,0x0100)
-
-      # enable accelerometer
-      tag.register_cb(0x2d,cbs.accel)
-      tag.char_write_cmd(0x31,0x01)
-      tag.char_write_cmd(0x2e,0x0100)
-
-      # enable humidity
-      tag.register_cb(0x38, cbs.humidity)
-      tag.char_write_cmd(0x3c,0x01)
-      tag.char_write_cmd(0x39,0x0100)
-
-      # enable magnetometer
-      tag.register_cb(0x40,cbs.magnet)
-      tag.char_write_cmd(0x44,0x01)
-      tag.char_write_cmd(0x41,0x0100)
-
-      # enable gyroscope
-      tag.register_cb(0x57,cbs.gyro)
-      tag.char_write_cmd(0x5b,0x07)
-      tag.char_write_cmd(0x58,0x0100)
-
-      # fetch barometer calibration
-      tag.char_write_cmd(0x4f,0x02)
-      rawcal = tag.char_read_hnd(0x52)
-      barometer = Barometer( rawcal )
-      # enable barometer
-      tag.register_cb(0x4b,cbs.baro)
-      tag.char_write_cmd(0x4f,0x01)
-      tag.char_write_cmd(0x4c,0x0100)
-
-      tag.notification_loop()
-     except:
-      pass
-
-if __name__ == "__main__":
-    main()
-
+    time.sleep(10)
