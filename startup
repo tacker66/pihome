@@ -1,8 +1,19 @@
 #
 mkdir -p /home/pi/tmp/pihome
 #
-sudo ./sensortag_test.py BC:6A:29:C3:6A:D0 &
+sudo hciconfig hci0 up
 #
-sleep 10
-sudo ./sensortag_test.py BC:6A:29:AB:EC:A8 &
+echo "press Sensortags side buttons"
+#
+sleep 5
+#
+sudo ./sensortag_run.py BC:6A:29:C3:6A:D0 &
+#
+sleep 5
+#
+sudo ./sensortag_run.py BC:6A:29:AB:EC:A8 &
+#
+#sleep 5
+#
+#sudo ./blemini_run.py 00:17:EA:91:BC:6D &
 #
