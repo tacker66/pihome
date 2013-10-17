@@ -1,4 +1,17 @@
 
+Wiring of Arduino Leonardo and BLEmini:
+---------------------------------------
+
+Install Biscuit-FW for BLEmini:
+-------------------------------
+See http://http://redbearlab.com/blemini/
+and https://github.com/RedBearLab/Biscuit.git.
+Using version bb24ba63.
+
+Download sketch ./Arduino/blemini_read_digital on Arduino Leonardo:
+-------------------------------------------------------------------
+Using Arduino 1.0.5.
+
 Install BlueZ 5.9:
 ------------------
 wget https://www.kernel.org/pub/linux/bluetooth/bluez-5.9.tar.xz
