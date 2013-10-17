@@ -1,0 +1,2 @@
+gatttool59 -b BC:6A:29:AB:EC:A8 --interactive
+
