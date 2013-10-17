@@ -120,5 +120,4 @@ while True:
     data.write("BAROM %.0f\n" % p)
     data.close()
 
-    time.sleep(30)
-
+    time.sleep(10)
