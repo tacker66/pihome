@@ -32,6 +32,8 @@
 import sys
 import time
 import pexpect
+
+sys.path.append('../.')
 from sensortag_funcs import *
 
 # start gatttool

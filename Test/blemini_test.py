@@ -60,12 +60,12 @@ while True:
     tool.sendline('char-read-hnd 0x15')
     tool.expect('descriptor: .*? \r') 
     v = tool.after.split()
-    data = long(float.fromhex(v[2] + v[1]))
+    val = long(float.fromhex(v[2] + v[1]))
 
-    print adr, " DATA 0x%4x" % data
+    print adr, " DATA 0x%04X" % val
 
     data = open("/home/pi/tmp/pihome/"+adr, "w")
-    data.write("DATA 0x%4x" % data)
+    data.write("DATA 0x%04X\n" % val)
     data.close()
 
     time.sleep(10)
