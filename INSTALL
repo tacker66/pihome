@@ -12,20 +12,24 @@ Download sketch ./Arduino/blemini_read_digital on Arduino Leonardo:
 -------------------------------------------------------------------
 Using Arduino 1.0.5.
 
-Install BlueZ 5.9:
-------------------
-wget https://www.kernel.org/pub/linux/bluetooth/bluez-5.9.tar.xz
-tar xvf bluez-5.9.tar.xz
+Install BlueZ 5.12:
+-------------------
 sudo apt-get install libdbus-1-dev libglib2.0-dev automake libudev-dev libical-dev libreadline-dev
-cd bluez-5.9
+wget https://www.kernel.org/pub/linux/bluetooth/bluez-5.12.tar.gz
+tar xvf bluez-5.12.tar.gz
+cd bluez-5.12
 ./configure --disable-systemd
 make
 sudo make install
-sudo cp attrib/gatttool /usr/local/bin/gatttool59
+sudo cp attrib/gatttool /usr/local/bin/gatttool512
 
-Install pexpect 3.0 (?):
-------------------------
+Install pexpect 3.0 :
+---------------------
+sudo apt-get install python-dev
+git clone https://github.com/pexpect/pexpect.git
+cd pexpect
+git checkout 3.0
+sudo python setup.py install
 
 Install xively-python:
 ----------------------
-
