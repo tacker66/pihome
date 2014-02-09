@@ -1,7 +1,7 @@
 
-Install Sensortag-FW:
----------------------
-Install current firmware with iOS SensorTag-App.
+Install latest SensorTag-FW:
+----------------------------
+Install latest SensorTag firmware with iOS SensorTag-App.
 Using FW V1.5.
 
 Wiring of Arduino Leonardo and BLEmini:
@@ -17,24 +17,26 @@ Download sketch ./Arduino/blemini_read_digital on Arduino Leonardo:
 -------------------------------------------------------------------
 Using Arduino 1.0.5.
 
-Install BlueZ 5.12:
+Install BlueZ 5.14:
 -------------------
 sudo apt-get install libdbus-1-dev libglib2.0-dev automake libudev-dev libical-dev libreadline-dev
-wget https://www.kernel.org/pub/linux/bluetooth/bluez-5.12.tar.gz
-tar xvf bluez-5.12.tar.gz
-cd bluez-5.12
+wget https://www.kernel.org/pub/linux/bluetooth/bluez-5.14.tar.gz
+tar xvf bluez-5.14.tar.gz
+cd bluez-5.14
 ./configure --disable-systemd
 make
 sudo make install
-sudo cp attrib/gatttool /usr/local/bin/gatttool512
+sudo cp attrib/gatttool /usr/local/bin/gatttool514
 
-Install pexpect 3.0 :
+Install pexpect 3.1 :
 ---------------------
 sudo apt-get install python-dev
 git clone https://github.com/pexpect/pexpect.git
 cd pexpect
-git checkout 3.0
+git checkout 3.1
 sudo python setup.py install
 
 Install xively-python:
 ----------------------
+
+
