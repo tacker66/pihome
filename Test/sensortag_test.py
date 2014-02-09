@@ -2,7 +2,7 @@
 
 #
 # Copyright 2013 Michael Saunby
-# Copyright 2013 Thomas Ackermann
+# Copyright 2013-2014 Thomas Ackermann
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@
 #
 # Read sensors from the TI SensorTag. It's a
 # BLE (Bluetooth low energy) device so by
-# automating gatttool (from BlueZ 5.9) with
-# pexpect we are able to read and write values.
+# automating gatttool (from BlueZ 5.14) with
+# pexpect (3.1) we are able to read and write values.
 #
 # Usage: sensortag_test.py BLUETOOTH_ADR
 #
@@ -38,10 +38,11 @@ from sensortag_funcs import *
 
 # start gatttool
 adr = sys.argv[1]
-tool = pexpect.spawn('gatttool59 -b ' + adr + ' --interactive')
+tool = pexpect.spawn('gatttool514 -b ' + adr + ' --interactive')
 tool.expect('\[LE\]>')
 
 # bug in pexpect? automating gatttool works only if we are using a logfile!
+# TODO: check again with pexpect 3.1 and gatttool 5.14
 logfile = open("/dev/null", "w")
 tool.logfile = logfile
 
