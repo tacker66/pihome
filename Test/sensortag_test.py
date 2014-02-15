@@ -29,6 +29,20 @@
 # To power up your bluetooth dongle run 'sudo hciconfig hci0 up'
 #
 
+#
+# SensorTag v1.5 handle ranges 
+# (discovered by 'primary' resp. 'characteristic' cmd in gatttool):
+#
+#   Temperature: 0x23 - 0x2d (set 0x29 = 01; read 0x25)
+# Accelerometer: 0x2e - 0x38
+#      Humidity: 0x39 - 0x43 (set 0x3f = 01; read 0x3b)
+#  Magnetometer: 0x44 - 0x4e
+#     Barometer: 0x4f - 0x5d (set 0x55 = 01/02; read 0x51/0x5b)
+#     Gyroscope: 0x5e - 0x68
+#          Keys: 0x69 - 0x6d
+#          Test: 0x6e - 0x74 (POST = 0x70; has to be 0x3f)
+#
+
 import sys
 import time
 import pexpect
@@ -36,42 +50,37 @@ import pexpect
 sys.path.append('../.')
 from sensortag_funcs import *
 
-# start gatttool
 adr = sys.argv[1]
 tool = pexpect.spawn('gatttool514 -b ' + adr + ' --interactive')
 tool.expect('\[LE\]>')
 
-# bug in pexpect? automating gatttool works only if we are using a logfile!
-# TODO: check again with pexpect 3.1 and gatttool 5.14
-logfile = open("/dev/null", "w")
-tool.logfile = logfile
-
-# connect to SensorTag
 print adr, " Trying to connect. You might need to press the side button ..."
 tool.sendline('connect')
-tool.expect('\[LE\]>')
+tool.expect('success')
 
 print adr, " Enabling sensors ..."
+
 # enable temperature sensor
-tool.sendline('char-write-cmd 0x29 01')
+tool.sendline('char-write-req 0x29 01')
 tool.expect('\[LE\]>')
 
 # enable humidity sensor
-tool.sendline('char-write-cmd 0x3c 01')
+tool.sendline('char-write-req 0x3f 01')
 tool.expect('\[LE\]>')
 
 # enable barometric pressure sensor
-tool.sendline('char-write-cmd 0x4f 02')
+tool.sendline('char-write-req 0x55 02')
 tool.expect('\[LE\]>')
 
-tool.sendline('char-read-hnd 0x52')
+tool.sendline('char-read-hnd 0x5b')
 tool.expect('descriptor: .*? \r')
 
 after = tool.after
 v = after.split()[1:] 
 vals = [long(float.fromhex(n)) for n in v]
 barometer = Barometer( vals )
-tool.sendline('char-write-cmd 0x4f 01')
+
+tool.sendline('char-write-req 0x55 01')
 tool.expect('\[LE\]>')
 
 # wait for the sensors to become ready
@@ -80,8 +89,14 @@ time.sleep(1)
 cnt = 0
 while True:
 
+    # read POST result
+    tool.sendline('char-read-hnd 0x70')
+    tool.expect('descriptor: .*? \r') 
+    v = tool.after.split()
+    post = v[1]
+
     cnt = cnt + 1
-    print adr, " CNT %d" % cnt
+    print adr, " CNT %d (POST 0x%s)" % (cnt, post)
 
     # read temperature sensor
     tool.sendline('char-read-hnd 0x25')
@@ -92,7 +107,7 @@ while True:
     (at, it) = calcTmp(rawAmbT, rawObjT)
 
     # read humidity sensor
-    tool.sendline('char-read-hnd 0x38')
+    tool.sendline('char-read-hnd 0x3b')
     tool.expect('descriptor: .*? \r') 
     v = tool.after.split()
     rawT = long(float.fromhex(v[2] + v[1]))
@@ -100,7 +115,7 @@ while True:
     (ht, h) = calcHum(rawT, rawH)
 
     # read barometric pressure sensor
-    tool.sendline('char-read-hnd 0x4B')
+    tool.sendline('char-read-hnd 0x51')
     tool.expect('descriptor: .*? \r') 
     v = tool.after.split()
     rawT = long(float.fromhex(v[2] + v[1]))
@@ -115,6 +130,7 @@ while True:
     print adr, " BAROM %.0f" % p
 
     data = open("/home/pi/tmp/pihome/"+adr, "w")
+    data.write(" POST %s\n" % post)
     data.write("IRTMP %.1f\n" % it)
     data.write("AMTMP %.1f\n" % at)
     data.write("HMTMP %.1f\n" % ht)
@@ -124,3 +140,5 @@ while True:
     data.close()
 
     time.sleep(10)
+
+
