@@ -40,7 +40,8 @@
 #     Barometer: 0x4f - 0x5d (set 0x55 = 01/02; read 0x51/0x5b)
 #     Gyroscope: 0x5e - 0x68
 #          Keys: 0x69 - 0x6d
-#          Test: 0x6e - 0x74 (POST = 0x70; has to be 0x3f)
+#          Test: 0x6e - 0x74 (POST = 0x70; bits: 0 0 gyro press acc mag hum temp, 
+#                                                0x3f means "OK"
 #
 
 import sys
