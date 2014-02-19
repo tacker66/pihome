@@ -1,0 +1,3 @@
+#
+sudo ./ble_discover.py BC:6A:29:C3:6A:D0
+#
