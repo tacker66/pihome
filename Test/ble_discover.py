@@ -37,6 +37,8 @@ def read_string(handle):
       idx = int(char, 16)
       if idx > 0:
         string = string + chr(idx)
+      else:
+        string = string + "\\" + char
     return "'" + string + "'"
   else:
     return "<empty>"
@@ -44,7 +46,26 @@ def read_string(handle):
 def read_property(handle):
   tool.sendline("char-read-hnd " + handle)
   tool.expect("descriptor: .*? \r")
-  return tool.after.split()[1]
+  prop = tool.after.split()[1]
+  val = int(prop, 16)
+  prop = prop + " = "
+  if val & 0x01:
+    prop = prop + "? "
+  if val & 0x02:
+    prop = prop + "read "
+  if val & 0x04:
+    prop = prop + "? "
+  if val & 0x08:
+    prop = prop + "write "
+  if val & 0x10:
+    prop = prop + "notify "
+  if val & 0x20:
+    prop = prop + "indicate "
+  if val & 0x40:
+    prop = prop + "? "
+  if val & 0x80:
+    prop = prop + "? "
+  return prop
 
 adr = sys.argv[1]
 tool = pexpect.spawn('gatttool514 -b ' + adr + ' --interactive')
@@ -71,7 +92,7 @@ for line in lines:
   handle = handle.lower()
   uuid = uuid.lower()
   if uuid == "2800":
-    sys.stdout.write(handle + " : primary" + "\n")
+    sys.stdout.write(handle + " : primary -------------------------------" + "\n")
   elif len(uuid) > 4:
     sys.stdout.write(handle + " :    characteristic = '" + uuid + "'" + "\n")
   elif uuid == "2803":
