@@ -1,21 +1,6 @@
 
-Install latest SensorTag-FW:
-----------------------------
-Install latest SensorTag firmware with iOS SensorTag-App.
-Using FW V1.5.
-
-Wiring of Arduino Leonardo and BLEmini:
----------------------------------------
-
-Install Biscuit-FW for BLEmini:
--------------------------------
-See http://http://redbearlab.com/blemini/
-and https://github.com/RedBearLab/Biscuit.git.
-Using version bb24ba63.
-
-Download sketch ./Arduino/blemini_read_digital on Arduino Leonardo:
--------------------------------------------------------------------
-Using Arduino 1.0.5.
+Install BlueZ and pexpect
+=========================
 
 Install BlueZ 5.14:
 -------------------
@@ -28,6 +13,7 @@ make
 sudo make install
 sudo cp attrib/gatttool /usr/local/bin/gatttool514
 
+
 Install pexpect 3.1 :
 ---------------------
 sudo apt-get install python-dev
@@ -36,7 +22,40 @@ cd pexpect
 git checkout 3.1
 sudo python setup.py install
 
+
+Texas Instruments SensorTag
+===========================
+
+Install SensorTag-FW:
+---------------------
+Install latest SensorTag firmware (V1.5) with iOS SensorTag-App.
+
+
+Arduino
+=======
+
+Download sketch ./Arduino/blemini_digitalread on Arduino Leonardo:
+-------------------------------------------------------------------
+Download sketch with Arduino 1.0.5.
+
+
+Install Biscuit-FW for BLEmini:
+-------------------------------
+See http://http://redbearlab.com/blemini/
+and https://github.com/RedBearLab/Biscuit.git.
+Install Biscuit-UART_20130912 from revision bb24ba63.
+
+
+Wiring of Arduino Leonardo and BLEmini:
+---------------------------------------
+TODO
+
+
+Connect to the outside world
+============================
+
 Install xively-python:
 ----------------------
+TODO
 
 
