@@ -55,7 +55,7 @@ adr = sys.argv[1]
 
 print adr, " Trying to connect. You might need to press the side button ..."
 
-tool = pexpect.spawn('gatttool514 -b ' + adr + ' --interactive')
+tool = pexpect.spawn('gatttool514 -b ' + adr + ' --interactive', timeout=60)
 tool.expect('\[LE\]>')
 tool.sendline('connect')
 tool.expect('success')
