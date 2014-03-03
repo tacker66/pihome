@@ -44,6 +44,7 @@
 #                                                0x3f means "OK"
 #
 
+import os
 import sys
 import time
 import pexpect
@@ -103,6 +104,12 @@ tool.expect('\[LE\]>')
 # wait for the sensors to become ready
 time.sleep(1)
 
+# create output directory
+try:
+  os.mkdir("/tmp/pihome")
+except:
+  pass
+
 cnt = 0
 while True:
 
@@ -146,7 +153,7 @@ while True:
     print adr, " HUMID %.0f" % h
     print adr, " BAROM %.0f" % p
 
-    data = open("/home/pi/tmp/pihome/"+adr, "w")
+    data = open("/tmp/pihome/"+adr, "w")
     data.write(" POST %s\n" % post)
     data.write("IRTMP %.1f\n" % it)
     data.write("AMTMP %.1f\n" % at)

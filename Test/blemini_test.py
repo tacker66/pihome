@@ -28,6 +28,7 @@
 # To power up your bluetooth dongle run 'sudo hciconfig hci0 up'
 #
 
+import os
 import sys
 import time
 import pexpect
@@ -47,6 +48,12 @@ print adr, " Trying to connect ..."
 tool.sendline('connect')
 tool.expect('\[LE\]>')
 
+# create output directory
+try:
+  os.mkdir("/tmp/pihome")
+except:
+  pass
+
 cnt = 0
 while True:
 
@@ -65,7 +72,7 @@ while True:
 
     print adr, " DATA 0x%04X" % val
 
-    data = open("/home/pi/tmp/pihome/"+adr, "w")
+    data = open("/tmp/pihome/"+adr, "w")
     data.write("DATA 0x%04X\n" % val)
     data.close()
 
