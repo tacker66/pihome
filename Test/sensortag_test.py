@@ -52,12 +52,28 @@ sys.path.append('../.')
 from sensortag_funcs import *
 
 adr = sys.argv[1]
-tool = pexpect.spawn('gatttool514 -b ' + adr + ' --interactive')
-tool.expect('\[LE\]>')
 
 print adr, " Trying to connect. You might need to press the side button ..."
+
+tool = pexpect.spawn('gatttool514 -b ' + adr + ' --interactive')
+tool.expect('\[LE\]>')
 tool.sendline('connect')
 tool.expect('success')
+
+print adr, " Switching to a lower energy connection ..."
+
+# gatttool not really connects with enough 'low energy' so reconfigure
+# the connection by setting min interval to 37.5ms, max interval 
+# to 75ms and timeout to 30s. By this the current needed for 
+# 'just being connected' in the SensorTag drops from 0.35mA to 0.05mA.
+cons = pexpect.run('hcitool con')
+cons = cons.split("\r\n")
+for con in cons:
+  if adr in con:
+    handle = con.split()[4]
+    error = pexpect.run('sudo hcitool lecup --handle ' + handle + ' --min 30 --max 60 --timeout 3000')
+    if error <> "":
+      print "hcittool error: " + error
 
 print adr, " Enabling sensors ..."
 
