@@ -67,6 +67,18 @@ def read_property(handle):
     prop = prop + "? "
   return prop
 
+def read_conprop(handle):
+  tool.sendline("char-read-hnd " + handle)
+  tool.expect("descriptor: .*? \r")
+  v = tool.after.split()
+  min_int   = str((float.fromhex(v[2] + v[1])) * 1.25)
+  max_int   = str((float.fromhex(v[4] + v[3])) * 1.25)
+  slave_lat = str((float.fromhex(v[6] + v[5])) * 1.25)
+  timeout   = str((float.fromhex(v[8] + v[7])) * 10)
+  ret_str  = "min = " + min_int + "ms; max = " + max_int + "ms; "
+  ret_str += "lat = " + slave_lat + "ms; timeout = " + timeout + "ms"
+  return ret_str
+
 adr = sys.argv[1]
 tool = pexpect.spawn('gatttool514 -b ' + adr + ' --interactive')
 tool.expect('\[LE\]>')
@@ -92,35 +104,38 @@ for line in lines:
   handle = handle.lower()
   uuid = uuid.lower()
   if uuid == "2800":
-    sys.stdout.write(handle + " : primary -------------------------------" + "\n")
+    sys.stdout.write(handle + " : primary --------------------------------------------" + "\n")
   elif len(uuid) > 4:
-    sys.stdout.write(handle + " :    characteristic = '" + uuid + "'" + "\n")
+    sys.stdout.write(handle + " :        characteristic : '" + uuid + "'" + "\n")
   elif uuid == "2803":
-    sys.stdout.write(handle + " :          property = ")
+    sys.stdout.write(handle + " :              property : ")
     sys.stdout.write(read_property(handle) + "\n")
   elif uuid == "2901":
-    sys.stdout.write(handle + " :       description = ")
+    sys.stdout.write(handle + " :           description : ")
     sys.stdout.write(read_string(handle) + "\n")
   elif uuid == "2a00":
-    sys.stdout.write(handle + " :              name = ")
+    sys.stdout.write(handle + " :                  name : ")
     sys.stdout.write(read_string(handle) + "\n")
+  elif uuid == "2a04":
+    sys.stdout.write(handle + " :  preferred connection : ")
+    sys.stdout.write(read_conprop(handle) + "\n")
   elif uuid == "2a24":
-    sys.stdout.write(handle + " :      model number = ")
+    sys.stdout.write(handle + " :          model number : ")
     sys.stdout.write(read_string(handle) + "\n")
   elif uuid == "2a25":
-    sys.stdout.write(handle + " :     serial number = ")
+    sys.stdout.write(handle + " :         serial number : ")
     sys.stdout.write(read_string(handle) + "\n")
   elif uuid == "2a26":
-    sys.stdout.write(handle + " : firmware revision = ")
+    sys.stdout.write(handle + " :     firmware revision : ")
     sys.stdout.write(read_string(handle) + "\n")
   elif uuid == "2a27":
-    sys.stdout.write(handle + " : hardware revision = ")
+    sys.stdout.write(handle + " :     hardware revision : ")
     sys.stdout.write(read_string(handle) + "\n")
   elif uuid == "2a28":
-    sys.stdout.write(handle + " : software revision = ")
+    sys.stdout.write(handle + " :     software revision : ")
     sys.stdout.write(read_string(handle) + "\n")
   elif uuid == "2a29":
-    sys.stdout.write(handle + " :      manufacturer = ")
+    sys.stdout.write(handle + " :          manufacturer : ")
     sys.stdout.write(read_string(handle) + "\n")
 
 sys.stdout.write("Discovery finished.\n")
