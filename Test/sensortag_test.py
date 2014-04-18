@@ -20,7 +20,7 @@
 #
 # Read sensors from the TI SensorTag. It's a
 # BLE (Bluetooth low energy) device so by
-# automating gatttool (from BlueZ 5.14) with
+# automating gatttool (from BlueZ 5.18) with
 # pexpect (3.1) we are able to read and write values.
 #
 # Usage: sensortag_test.py BLUETOOTH_ADR
@@ -94,7 +94,7 @@ while True:
 
     print adr, " Trying to connect. You might need to press the side button ..."
 
-    tool = pexpect.spawn('gatttool514 -b ' + adr + ' --interactive')
+    tool = pexpect.spawn('gatttool518 -b ' + adr + ' --interactive')
     tool.expect('\[LE\]>')
     tool.sendline('connect')
     tool.expect('success')

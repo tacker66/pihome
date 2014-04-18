@@ -80,7 +80,7 @@ def read_conprop(handle):
   return ret_str
 
 adr = sys.argv[1]
-tool = pexpect.spawn('gatttool514 -b ' + adr + ' --interactive')
+tool = pexpect.spawn('gatttool518 -b ' + adr + ' --interactive')
 tool.expect('\[LE\]>')
 
 sys.stdout.write("Trying to connect to '" + 
