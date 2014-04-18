@@ -17,7 +17,7 @@
 #
 
 #
-# Disvover characteristics of BLE (Bluetooth low energy) devices
+# Discover characteristics of BLE (Bluetooth low energy) devices
 #
 # Usage: ble_discover.py BLUETOOTH_ADR
 #
