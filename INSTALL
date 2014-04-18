@@ -54,6 +54,10 @@ TODO
 Connect to the outside world
 ============================
 
+Install lighttpd:
+-----------------
+sudo apt-get install lighttpd
+
 Install xively-python:
 ----------------------
 TODO
