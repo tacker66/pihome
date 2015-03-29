@@ -1,6 +1,6 @@
 
-Install BlueZ and pexpect
-=========================
+Install BlueZ and pexpect on Raspbery Pi with Raspbian
+======================================================
 
 Install BlueZ 5.18:
 -------------------
@@ -31,23 +31,34 @@ Install SensorTag-FW:
 Install latest SensorTag firmware (V1.5) with iOS SensorTag-App.
 
 
-Arduino
-=======
+RedBearLab BLEMini
+==================
 
-Download sketch ./Arduino/blemini_digitalread on Arduino Leonardo:
--------------------------------------------------------------------
-Download sketch with Arduino 1.0.5.
-
-
-Install Biscuit-FW for BLEmini:
+Install Biscuit-FW for BLEMini:
 -------------------------------
 See http://http://redbearlab.com/blemini/
 and https://github.com/RedBearLab/Biscuit.git.
 Install Biscuit-UART_20140409 from revision 1f6832fc.
 
 
-Wiring of Arduino Leonardo and BLEmini:
----------------------------------------
+Texas Instruments Launchpad
+===========================
+
+Download sketch ./Launchpad/blemini_digitalread to Launchpad with MSP430G2552:
+------------------------------------------------------------------------------
+Download sketch with Energia 0101E0015.
+
+
+Arduino
+=======
+
+Download sketch ./Arduino/blemini_digitalread to Arduino Nano:
+--------------------------------------------------------------
+Download sketch with Arduino 1.0.5.
+
+
+Wiring of Arduino Nano / Launchpad with BLEMini:
+================================================
 TODO
 
 
@@ -61,5 +72,3 @@ sudo apt-get install lighttpd
 Install xively-python:
 ----------------------
 TODO
-
-
