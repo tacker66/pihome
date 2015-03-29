@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 #
-# Copyright 2013-2014 Thomas Ackermann
+# Copyright 2013-2015 Thomas Ackermann
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 #
 
 #
-# Read digital inputs from an Arduino connected to a RedBearLabs BLEmini. 
+# Read digital inputs from a RedBearLabs BLEmini. 
 # BLEmini is a BLE (Bluetooth low energy) device so by
 # automating gatttool (from BlueZ 5.18) with
 # pexpect (3.1) we are able to read and write values.
@@ -28,25 +28,28 @@
 # To power up your bluetooth dongle run 'sudo hciconfig hci0 up'
 #
 
+#
+# BLEMini Biscuit v2.0 handles
+# (discovered by 'primary' resp. 'characteristic' cmd in gatttool):
+#
+# 0x12: read list of bytes transferred to BLEMini via serial connection
+# 0x16: write byte to BLEMini to be received via serial connection
+#
+
 import os
 import sys
 import time
+import random
 import pexpect
 
-# start gatttool
 adr = sys.argv[1]
+
+print adr, " Trying to connect ..."
+
 tool = pexpect.spawn('gatttool518 -b ' + adr + ' --interactive')
 tool.expect('\[LE\]>')
-
-# bug in pexpect? automating gatttool works only if we are using a logfile!
-# TODO: check again with pexpect 3.1 and gatttool 5.18
-logfile = open("/dev/null", "w")
-tool.logfile = logfile
-
-# connect to BLEmini
-print adr, " Trying to connect ..."
 tool.sendline('connect')
-tool.expect('\[LE\]>')
+tool.expect('success')
 
 # create output directory
 try:
@@ -54,26 +57,31 @@ try:
 except:
   pass
 
+err = 0
 cnt = 0
 while True:
 
     cnt = cnt + 1
-    print adr, " CNT %d" % cnt
+    rnd = random.randint(0,255)
 
-    # trigger a latch of digital inputs on Arduino
-    tool.sendline('char-write-cmd 0x19 00')
+    # send byte to BLEMini
+    tool.sendline('char-write-cmd 0x16 ' + ("0x%02X" % rnd))
     tool.expect('\[LE\]>')
     
-    # read digital input values from Arduino
-    tool.sendline('char-read-hnd 0x15')
+    # read byte/s from BLEMini
+    tool.sendline('char-read-hnd 0x12')
     tool.expect('descriptor: .*? \r') 
     v = tool.after.split()
-    val = long(float.fromhex(v[2] + v[1]))
+    val = int(float.fromhex(v[1]))
 
-    print adr, " DATA 0x%04X" % val
+    if val != rnd:
+        err = err + 1
+
+    print adr, " CNT %04d, RND 0x%02X, DATA 0x%02X, ERR %d" % (cnt, rnd, val, err)
 
     data = open("/tmp/pihome/"+adr, "w")
-    data.write("DATA 0x%04X\n" % val)
+    data.write("DATA 0x%02X\n" % val)
     data.close()
 
-    time.sleep(10)
+    time.sleep(1)
+
