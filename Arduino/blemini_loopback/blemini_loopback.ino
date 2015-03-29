@@ -45,8 +45,8 @@ void setup()
 
 void loop()
 {
-  static byte toggle = HIGH;
-  static byte data;
+  byte toggle = HIGH;
+  byte data   = 0;
   
   if(myserial.available())
   {
@@ -56,41 +56,11 @@ void loop()
 
     while(myserial.available())
     {
-      byte cnt = 0;
-      data = myserial.read();
-      Serial.print(cnt++); 
-      Serial.print(": 0x"); 
+      data = myserial.read(); // beware: BLEMini first sends a '0' before the real data
+      Serial.print("0x");
       Serial.println(data, HEX);
     }
     
-    myserial.write((byte)0xAA);
     myserial.write(data);
-
-    myserial.write((byte)0xBB);
-    myserial.write(data);
-
-    myserial.write((byte)0xCC);
-    myserial.write(data);
-
-    myserial.write((byte)0xDD);
-    
-    /*
-    static byte old_state = LOW;
-    if(digitalRead(IN_PIN) != old_state)
-    {
-      old_state = digitalRead(IN_PIN);
-
-      if(digitalRead(IN_PIN) == HIGH)
-      {
-        Serial.write((byte)0x11);
-        Serial.write((byte)0x01);
-      }
-      else
-      {
-        Serial.write((byte)0x11);
-        Serial.write((byte)0x00);
-      }
-    }
-    */
   }
 }
