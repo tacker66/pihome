@@ -1,5 +1,5 @@
 //
-// Copyright 2013 Thomas Ackermann
+// Copyright 2013-15 Thomas Ackermann
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
   loopback test for reading/writing values from/to BLEmini<->Arduino Nano
 
   in gatttool:
-  char-write-cmd 0x19 <value> 
+  char-write-cmd 0x16 <value> 
   yields in Arduino:
   read <value> from Serial.read
 
@@ -27,7 +27,7 @@
   Serial.write((byte)val2);
   ...
   yields in gatttool:
-  char-read-hnd 0x15 -> list of val<n> 
+  char-read-hnd 0x12 -> list of val<n> 
 */
 
 #include <SoftwareSerial.h>

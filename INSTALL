@@ -43,7 +43,7 @@ Install Biscuit-FW for BLEmini:
 -------------------------------
 See http://http://redbearlab.com/blemini/
 and https://github.com/RedBearLab/Biscuit.git.
-Install Biscuit-UART_20130912 from revision bb24ba63.
+Install Biscuit-UART_20140409 from revision 1f6832fc.
 
 
 Wiring of Arduino Leonardo and BLEmini:
