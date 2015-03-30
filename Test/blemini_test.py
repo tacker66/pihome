@@ -34,6 +34,8 @@
 #
 # 0x12: read list of bytes transferred to BLEMini via serial connection
 # 0x16: write byte to BLEMini to be received via serial connection
+# 0x19: set baudrate for serial port (value is remanent; possible values are: 
+#                      00=9600, 01=19200, 02=38400, 03=57600(default), 04=115200)
 #
 
 import os
@@ -57,15 +59,19 @@ try:
 except:
   pass
 
+# set baudrate to 9600
+tool.sendline('char-write-cmd 0x19 00')
+tool.expect('\[LE\]>')
+
 err = 0
 cnt = 0
 while True:
 
     cnt = cnt + 1
-    rnd = random.randint(0,255)
+    rnd = random.randint(0, 255)
 
     # send byte to BLEMini
-    tool.sendline('char-write-cmd 0x16 ' + ("0x%02X" % rnd))
+    tool.sendline('char-write-cmd 0x16 ' + ("%02X" % rnd))
     tool.expect('\[LE\]>')
     
     # read byte/s from BLEMini

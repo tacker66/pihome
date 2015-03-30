@@ -17,17 +17,17 @@
 /*
   loopback test for reading/writing values from/to BLEMini
 
-  in gatttool:
-  char-write-cmd 0x16 <value>
-  yields in Arduino:
-  read <value> from Serial.read
+  in gatttool:    char-write-cmd 0x19 00
+  -> on BLEMini:  sets baudrate to 9600
 
-  in Arduino:
-  Serial.write((byte)val1);
-  Serial.write((byte)val2);
-  ...
-  yields in gatttool:
-  char-read-hnd 0x12 -> list of val<n>
+  in gatttool:      char-write-cmd 0x16 <value>
+  -> on LaunchPad:  read <value> from Serial.read
+  
+  on LaunchPad:
+    Serial.write((byte)val1);
+    Serial.write((byte)val2);
+    ...
+  -> in gatttool: char-read-hnd 0x12 -> list of val<n>
 */
 
 #include <SoftwareSerial.h>
@@ -40,7 +40,7 @@ void setup()
 {
   pinMode(TEST_PIN, OUTPUT);
   Serial.begin(9600);
-  myserial.begin(57600);
+  myserial.begin(9600);
 }
 
 void loop()
@@ -56,7 +56,7 @@ void loop()
 
     while(myserial.available())
     {
-      data = myserial.read(); // beware: BLEMini first sends a '0' before the real data
+      data = myserial.read();
       Serial.print("0x");
       Serial.println(data, HEX);
     }
@@ -64,3 +64,4 @@ void loop()
     myserial.write(data);
   }
 }
+
