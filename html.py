@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 #
-# Copyright 2014 Thomas Ackermann
+# Copyright 2014-15 Thomas Ackermann
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 # and this script must be run as root.
 #
 
-import glob, string, time
+import glob, string, time, os
 
 path = "/tmp/pihome/*"
 html = "/var/www/index.html"
@@ -33,16 +33,19 @@ while True:
     hd.write('pihome data\n')
     hd.write('</title><meta http-equiv="refresh" content="20">\n')
     hd.write('<head><body>\n')
-    hd.write('<h2>pihome data</h2><table border="1">\n')
-    files = glob.glob(path)
+    hd.write('<h2>pihome data</h2>\n')
+    files = sorted(glob.glob(path))
     for file in files:
+        hd.write('<h3>' + os.path.basename(file) + '</h3>')
+        hd.write('<table border="1">\n')
         fd = open(file)
         for line in fd:
             tok = string.strip(line).split()
             hd.write('<tr><td align="right">' + tok[0] + '</td>\n')
             hd.write('<td align="left">' + string.join(tok[1:]) + '</td></tr>\n')
         fd.close()
-    hd.write('</table></body></html>\n')
+        hd.write('</table>\n')
+    hd.write('</body></html>\n')
     hd.close()
-    time.sleep(20)
+    time.sleep(10)
     
