@@ -55,42 +55,45 @@ from sensortag_funcs import *
 
 adr = sys.argv[1]
 
-# create output directory
+logdir = "/tmp/pihome"
 try:
-  os.mkdir("/tmp/pihome")
+  os.mkdir(logdir)
 except:
   pass
 
-exceptions = 0
-stamp = datetime.now().ctime()
-post = "<empty>"
-
+cnt = 0
 it = 0
 at = 0
 ht = 0
 pt = 0
 hu = 0
 pr = 0
+exc = 0
+post = ""
+stamp = ""
+handle = ""
 
 def log_values():
+  print adr, "   CNT %d" % cnt
+  print adr, "  POST 0x%s" % post
   print adr, " IRTMP %.1f" % it
   print adr, " AMTMP %.1f" % at
   print adr, " HMTMP %.1f" % ht
   print adr, " BRTMP %.1f" % pt
   print adr, " HUMID %.0f" % hu
   print adr, " BAROM %.0f" % pr
-  print adr, " EXCPT %d" % exceptions
+  print adr, " EXCPT %d" % exc
   print adr, " STAMP '%s'" % stamp
 
-  data = open("/tmp/pihome/"+adr, "w")
-  data.write(" POST %s\n" % post)
+  data = open(logdir+"/"+adr, "w")
+  data.write(" POST 0x%s\n" % post)
   data.write("IRTMP %.1f\n" % it)
   data.write("AMTMP %.1f\n" % at)
   data.write("HMTMP %.1f\n" % ht)
   data.write("BRTMP %.1f\n" % pt)
   data.write("HUMID %.0f\n" % hu)
   data.write("BAROM %.0f\n" % pr)
-  data.write("EXCPT %d\n" % exceptions)
+  data.write("EXCPT %d\n" % exc)
   data.write("STAMP '%s'\n" % stamp)
   data.close()
 
@@ -151,13 +154,6 @@ while True:
     # wait for the sensors to become ready
     time.sleep(1)
 
-    # create output directory
-    try:
-      os.mkdir("/tmp/pihome")
-    except:
-      pass
-
-    cnt = 0
     while True:
 
         # read POST result
@@ -165,9 +161,6 @@ while True:
         tool.expect('descriptor: .*? \r') 
         v = tool.after.split()
         post = v[1]
-
-        cnt = cnt + 1
-        print adr, " CNT %d (POST 0x%s)" % (cnt, post)
 
         # read temperature sensor
         tool.sendline('char-read-hnd 0x25')
@@ -193,6 +186,8 @@ while True:
         rawP = long(float.fromhex(v[4] + v[3]))
         (pt, pr) = barometer.calc(rawT, rawP)
 
+        cnt = cnt + 1
+
         stamp = datetime.now().ctime()
 
         log_values()
@@ -205,9 +200,10 @@ while True:
     sys.exit()
 
   except:
-    pexpect.run('sudo hcitool ledc ' + handle)
+    if handle != "":
+        pexpect.run('sudo hcitool ledc ' + handle)
     tool.sendline('quit')
     tool.close(force=True)
-    exceptions = exceptions + 1
+    exc = exc + 1
     log_values()
 

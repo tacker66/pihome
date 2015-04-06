@@ -47,24 +47,29 @@ from datetime import datetime
 
 adr = sys.argv[1]
 
-# create output directory
+logdir = "/tmp/pihome"
 try:
-  os.mkdir("/tmp/pihome")
+  os.mkdir(logdir)
 except:
   pass
 
-exceptions = 0
-stamp = datetime.now().ctime()
+cnt = 0
+rnd = 0
+val = 0
+err = 0
+exc = 0
+stamp = ""
+handle = ""
 
 def log_values():
-  print adr, " CNT %04d, RND 0x%02X, DATA 0x%02X, ERR %d, EXC %d" % (cnt, rnd, val, err, exceptions)
+  print adr, " CNT %04d, RND 0x%02X, DATA 0x%02X, ERR %d, EXC %d" % (cnt, rnd, val, err, exc)
   print adr, " STAMP '%s'" % stamp
 
-  data = open("/tmp/pihome/"+adr, "w")
-  data.write("  RND 0x%02X\n" % val)
+  data = open(logdir+"/"+adr, "w")
+  data.write("  RND 0x%02X\n" % rnd)
   data.write(" DATA 0x%02X\n" % val)
   data.write("  ERR %d\n" % err)
-  data.write("EXCPT %d\n" % exceptions)
+  data.write("EXCPT %d\n" % exc)
   data.write("STAMP '%s'\n" % stamp)
   data.close()
 
@@ -91,11 +96,8 @@ while True:
     tool.sendline('char-write-cmd 0x19 00')
     tool.expect('\[LE\]>')
 
-    err = 0
-    cnt = 0
     while True:
 
-        cnt = cnt + 1
         rnd = random.randint(0, 255)
 
         # send byte to BLEMini
@@ -107,6 +109,8 @@ while True:
         tool.expect('descriptor: .*? \r') 
         v = tool.after.split()
         val = int(float.fromhex(v[1]))
+
+        cnt = cnt + 1
 
         if val != rnd:
             err = err + 1
@@ -123,8 +127,10 @@ while True:
     sys.exit()
 
   except:
-    pexpect.run('sudo hcitool ledc ' + handle)
+    if handle != "":
+        pexpect.run('sudo hcitool ledc ' + handle)
     tool.sendline('quit')
     tool.close(force=True)
-    exceptions = exceptions + 1
+    exc = exc + 1
     log_values()
+
