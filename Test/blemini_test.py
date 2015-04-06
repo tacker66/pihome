@@ -43,15 +43,9 @@ import sys
 import time
 import random
 import pexpect
+from datetime import datetime
 
 adr = sys.argv[1]
-
-print adr, " Trying to connect ..."
-
-tool = pexpect.spawn('gatttool518 -b ' + adr + ' --interactive')
-tool.expect('\[LE\]>')
-tool.sendline('connect')
-tool.expect('success')
 
 # create output directory
 try:
@@ -59,35 +53,78 @@ try:
 except:
   pass
 
-# set baudrate to 9600
-tool.sendline('char-write-cmd 0x19 00')
-tool.expect('\[LE\]>')
+exceptions = 0
+stamp = datetime.now().ctime()
 
-err = 0
-cnt = 0
+def log_values():
+  print adr, " CNT %04d, RND 0x%02X, DATA 0x%02X, ERR %d, EXC %d" % (cnt, rnd, val, err, exceptions)
+  print adr, " STAMP '%s'" % stamp
+
+  data = open("/tmp/pihome/"+adr, "w")
+  data.write("  RND 0x%02X\n" % val)
+  data.write(" DATA 0x%02X\n" % val)
+  data.write("  ERR %d\n" % err)
+  data.write("EXCPT %d\n" % exceptions)
+  data.write("STAMP '%s'\n" % stamp)
+  data.close()
+
 while True:
 
-    cnt = cnt + 1
-    rnd = random.randint(0, 255)
+  try:
 
-    # send byte to BLEMini
-    tool.sendline('char-write-cmd 0x16 ' + ("%02X" % rnd))
+    print adr, " Trying to connect ..."
+
+    tool = pexpect.spawn('gatttool518 -b ' + adr + ' --interactive')
     tool.expect('\[LE\]>')
-    
-    # read byte/s from BLEMini
-    tool.sendline('char-read-hnd 0x12')
-    tool.expect('descriptor: .*? \r') 
-    v = tool.after.split()
-    val = int(float.fromhex(v[1]))
+    tool.sendline('connect')
+    tool.expect('success')
 
-    if val != rnd:
-        err = err + 1
+    # find handle
+    cons = pexpect.run('hcitool con')
+    cons = cons.split("\r\n")
+    for con in cons:
+      if adr in con:
+        tok = con.split()
+        handle = tok[4]
 
-    print adr, " CNT %04d, RND 0x%02X, DATA 0x%02X, ERR %d" % (cnt, rnd, val, err)
+    # set baudrate to 9600
+    tool.sendline('char-write-cmd 0x19 00')
+    tool.expect('\[LE\]>')
 
-    data = open("/tmp/pihome/"+adr, "w")
-    data.write("DATA 0x%02X\n" % val)
-    data.close()
+    err = 0
+    cnt = 0
+    while True:
 
-    time.sleep(1)
+        cnt = cnt + 1
+        rnd = random.randint(0, 255)
 
+        # send byte to BLEMini
+        tool.sendline('char-write-cmd 0x16 ' + ("%02X" % rnd))
+        tool.expect('\[LE\]>')
+        
+        # read byte/s from BLEMini
+        tool.sendline('char-read-hnd 0x12')
+        tool.expect('descriptor: .*? \r') 
+        v = tool.after.split()
+        val = int(float.fromhex(v[1]))
+
+        if val != rnd:
+            err = err + 1
+
+        stamp = datetime.now().ctime()
+
+        log_values()
+
+        time.sleep(5)
+
+  except KeyboardInterrupt:
+    tool.sendline('quit')
+    tool.close()
+    sys.exit()
+
+  except:
+    pexpect.run('sudo hcitool ledc ' + handle)
+    tool.sendline('quit')
+    tool.close(force=True)
+    exceptions = exceptions + 1
+    log_values()
