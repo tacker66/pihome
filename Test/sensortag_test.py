@@ -2,7 +2,7 @@
 
 #
 # Copyright 2013 Michael Saunby
-# Copyright 2013-2014 Thomas Ackermann
+# Copyright 2013-2015 Thomas Ackermann
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -54,6 +54,12 @@ sys.path.append('../.')
 from sensortag_funcs import *
 
 adr = sys.argv[1]
+
+# create output directory
+try:
+  os.mkdir("/tmp/pihome")
+except:
+  pass
 
 exceptions = 0
 stamp = datetime.now().ctime()
