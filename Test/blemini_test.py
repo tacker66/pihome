@@ -58,11 +58,12 @@ rnd = 0
 val = 0
 err = 0
 exc = 0
+act = 0
 stamp = ""
 handle = ""
 
 def log_values():
-  print adr, " CNT %04d, RND 0x%02X, DATA 0x%02X, ERR %d, EXC %d" % (cnt, rnd, val, err, exc)
+  print adr, " CNT %04d, RND 0x%02X, DATA 0x%02X, ERR %d, EXC %d, ACT %d" % (cnt, rnd, val, err, exc, act)
   print adr, " STAMP '%s'" % stamp
 
   data = open(logdir+"/"+adr, "w")
@@ -70,6 +71,7 @@ def log_values():
   data.write(" DATA 0x%02X\n" % val)
   data.write("  ERR %d\n" % err)
   data.write("EXCPT %d\n" % exc)
+  data.write("ACTEX %d\n" % act)
   data.write("STAMP '%s'\n" % stamp)
   data.close()
 
@@ -116,6 +118,7 @@ while True:
             err = err + 1
 
         stamp = datetime.now().ctime()
+        act = 0
 
         log_values()
 
@@ -132,5 +135,6 @@ while True:
     tool.sendline('quit')
     tool.close(force=True)
     exc = exc + 1
+    act = 1
     log_values()
 

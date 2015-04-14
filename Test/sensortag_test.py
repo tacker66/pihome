@@ -69,6 +69,7 @@ pt = 0
 hu = 0
 pr = 0
 exc = 0
+act = 0
 post = ""
 stamp = ""
 handle = ""
@@ -83,6 +84,7 @@ def log_values():
   print adr, " HUMID %.0f" % hu
   print adr, " BAROM %.0f" % pr
   print adr, " EXCPT %d" % exc
+  print adr, " ACTEX %d" % act
   print adr, " STAMP '%s'" % stamp
 
   data = open(logdir+"/"+adr, "w")
@@ -94,6 +96,7 @@ def log_values():
   data.write("HUMID %.0f\n" % hu)
   data.write("BAROM %.0f\n" % pr)
   data.write("EXCPT %d\n" % exc)
+  data.write("ACTEX %d\n" % act)
   data.write("STAMP '%s'\n" % stamp)
   data.close()
 
@@ -189,6 +192,7 @@ while True:
         cnt = cnt + 1
 
         stamp = datetime.now().ctime()
+        act = 0
 
         log_values()
 
@@ -205,5 +209,6 @@ while True:
     tool.sendline('quit')
     tool.close(force=True)
     exc = exc + 1
+    act = 1
     log_values()
 
