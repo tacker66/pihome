@@ -69,6 +69,16 @@ Install lighttpd:
 -----------------
 sudo apt-get install lighttpd
 
+Install PiGlow:
+---------------
+sudo raspi-config (navigate to Advanced Options, then I2C and answer Yes to both questions)
+sudo apt-get install python-smbus libi2c-dev
+curl get.pimoroni.com/i2c | bash
+reboot!
+git clone https://github.com/benleb/PyGlow.git
+cd PyGlow && git checkout v0.2
+sudo python setup.py install
+
 Install xively-python:
 ----------------------
 TODO
