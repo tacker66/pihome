@@ -196,7 +196,7 @@ while True:
 
         log_values()
 
-        time.sleep(5)
+        time.sleep(3)
 
   except KeyboardInterrupt:
     tool.sendline('quit')

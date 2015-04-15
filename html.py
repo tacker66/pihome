@@ -47,5 +47,5 @@ while True:
         hd.write('</table>\n')
     hd.write('</body></html>\n')
     hd.close()
-    time.sleep(10)
+    time.sleep(5)
     

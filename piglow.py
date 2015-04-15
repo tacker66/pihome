@@ -65,8 +65,7 @@ try:
 
         pyglow.update_leds()
 
-        time.sleep(10)
+        time.sleep(5)
 
 except KeyboardInterrupt:
     pyglow.all(0)
-
