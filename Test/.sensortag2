@@ -1,2 +1,2 @@
-gatttool518 -b BC:6A:29:AB:EC:A8 --interactive
+gatttool530 -b BC:6A:29:AB:EC:A8 --interactive
 
