@@ -14,12 +14,12 @@ sudo make install
 sudo cp attrib/gatttool /usr/local/bin/gatttool530
 
 
-Install pexpect 3.1 :
+Install pexpect 3.3 :
 ---------------------
 sudo apt-get install python-dev
 git clone https://github.com/pexpect/pexpect.git
 cd pexpect
-git checkout 3.1
+git checkout 3.3
 sudo python setup.py install
 
 
@@ -82,3 +82,4 @@ sudo python setup.py install
 Install xively-python:
 ----------------------
 TODO
+
