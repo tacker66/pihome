@@ -1,7 +1,5 @@
 #
-mkdir -p /home/pi/tmp/pihome
-#
-sudo hciconfig hci0 up
+mkdir -p /tmp/pihome
 #
 echo "press Sensortags side buttons"
 #
@@ -15,5 +13,11 @@ sudo ./sensortag_run.py BC:6A:29:AB:EC:A8 &
 #
 #sleep 5
 #
-#sudo ./blemini_run.py 00:17:EA:91:BC:6D &
+sudo ./blemini_run.py 00:17:EA:91:BC:6D &
+#
+sudo ./piglow.py
+#
+sudo ./html.py
+#
+# sudo ./thingspeak.py
 #
