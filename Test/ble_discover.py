@@ -80,7 +80,7 @@ def read_conprop(handle):
   return ret_str
 
 adr = sys.argv[1]
-tool = pexpect.spawn('gatttool530 -b ' + adr + ' --interactive')
+tool = pexpect.spawn('gatttool535 -b ' + adr + ' --interactive')
 tool.expect('\[LE\]>')
 
 sys.stdout.write("Trying to connect to '" + adr + "' (device must be advertising) ...\n")

@@ -9,16 +9,16 @@ sudo rpi-update d3e6f4a2
 Install BlueZ and pexpect on Raspbery Pi with Raspbian
 ======================================================
 
-Install BlueZ 5.30:
+Install BlueZ 5.35:
 -------------------
 sudo apt-get install libdbus-1-dev libglib2.0-dev automake libudev-dev libical-dev libreadline-dev
-wget https://www.kernel.org/pub/linux/bluetooth/bluez-5.30.tar.gz
-tar xvf bluez-5.30.tar.gz
-cd bluez-5.30
+wget https://www.kernel.org/pub/linux/bluetooth/bluez-5.35.tar.gz
+tar xvf bluez-5.35.tar.gz
+cd bluez-5.35
 ./configure --disable-systemd
 make
 sudo make install
-sudo cp attrib/gatttool /usr/local/bin/gatttool530
+sudo cp attrib/gatttool /usr/local/bin/gatttool535
 
 Install pexpect 3.3:
 --------------------
