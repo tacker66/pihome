@@ -2,7 +2,7 @@
 
 #
 # Copyright 2013 Michael Saunby
-# Copyright 2013-2015 Thomas Ackermann
+# Copyright 2013-2016 Thomas Ackermann
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -56,13 +56,10 @@ adr = sys.argv[1]
 
 logdir = "/tmp/pihome"
 try:
-  os.mkdir(logdir)
+    os.mkdir(logdir)
 except:
-  pass
+    pass
 
-cnt = 0
-it = 0
-at = 0
 ht = 0
 pt = 0
 hu = 0
@@ -74,140 +71,150 @@ stamp = ""
 handle = ""
 
 def log_values():
-  print adr, "   CNT %d" % cnt
-  print adr, "  POST 0x%s" % post
-  print adr, " IRTMP %.1f" % it
-  print adr, " AMTMP %.1f" % at
-  print adr, " HMTMP %.1f" % ht
-  print adr, " BRTMP %.1f" % pt
-  print adr, " HUMID %.0f" % hu
-  print adr, " BAROM %.0f" % pr
-  print adr, " EXCPT %d" % exc
-  print adr, " ACTEX %d" % act
-  print adr, " STAMP '%s'" % stamp
+    print adr, "  POST 0x%s" % post
+    print adr, " HMTMP %.1f" % ht
+    print adr, " BRTMP %.1f" % pt
+    print adr, " AVTMP %.1f" % ((ht + pt) / 2)
+    print adr, " HUMID %.0f" % hu
+    print adr, " BAROM %.0f" % pr
+    print adr, " EXCPT %d" % exc
+    print adr, " ACTEX %d" % act
+    print adr, " STAMP '%s'" % stamp
+    data = open(logdir+"/"+adr, "w")
+    data.write(" POST 0x%s\n" % post)
+    data.write("HMTMP %.1f\n" % ht)
+    data.write("BRTMP %.1f\n" % pt)
+    data.write("AVTMP %.1f\n" % ((ht + pt) / 2))
+    data.write("HUMID %.0f\n" % hu)
+    data.write("BAROM %.0f\n" % pr)
+    data.write("EXCPT %d\n" % exc)
+    data.write("ACTEX %d\n" % act)
+    data.write("STAMP '%s'\n" % stamp)
+    data.close()
 
-  data = open(logdir+"/"+adr, "w")
-  data.write(" POST 0x%s\n" % post)
-  data.write("IRTMP %.1f\n" % it)
-  data.write("AMTMP %.1f\n" % at)
-  data.write("HMTMP %.1f\n" % ht)
-  data.write("BRTMP %.1f\n" % pt)
-  data.write("HUMID %.0f\n" % hu)
-  data.write("BAROM %.0f\n" % pr)
-  data.write("EXCPT %d\n" % exc)
-  data.write("ACTEX %d\n" % act)
-  data.write("STAMP '%s'\n" % stamp)
-  data.close()
-
-while True:
-
-  try:
-
-    print adr, " Trying to connect. You might need to press the side button ..."
-
-    tool = pexpect.spawn('gatttool535 -b ' + adr + ' --interactive')
-    tool.expect('\[LE\]>')
-    tool.sendline('connect')
-    tool.expect('success')
-
-    print adr, " Switching to a lower energy connection ..."
-
-    # gatttool not really connects with enough 'low energy' so reconfigure
-    # the connection to the values preferred by SensorTag (see characteristic 0x2A04):
-    # i.e. min interval to 100ms and max interval to 200ms.
-    # By this the current needed for 'just being connected' in the SensorTag 
-    # drops from 0.35mA to 0.01mA.
-    cons = pexpect.run('hcitool con')
-    cons = cons.split("\r\n")
-    for con in cons:
-      if adr in con:
-        tok = con.split()
-        handle = tok[4]
-        state = tok[6]
-        error = pexpect.run('sudo hcitool lecup --handle ' + handle + ' --min 80 --max 160')
-        if error <> "":
-          print "hcittool error: '" + error + "' (handle: " + handle + ", state: " + state + ")"
-
-    print adr, " Enabling sensors ..."
-
-    # enable temperature sensor
-    tool.sendline('char-write-req 0x29 01')
-    tool.expect('\[LE\]>')
-
+def enable_sensors():
     # enable humidity sensor
     tool.sendline('char-write-req 0x3f 01')
     tool.expect('\[LE\]>')
-
     # enable barometric pressure sensor
     tool.sendline('char-write-req 0x55 02')
     tool.expect('\[LE\]>')
-
     tool.sendline('char-read-hnd 0x5b')
     tool.expect('descriptor: .*? \r')
-
     after = tool.after
     v = after.split()[1:] 
     vals = [long(float.fromhex(n)) for n in v]
+    global barometer
     barometer = Barometer( vals )
-
     tool.sendline('char-write-req 0x55 01')
     tool.expect('\[LE\]>')
 
-    # wait for the sensors to become ready
-    time.sleep(1)
+def disable_sensors():
+    # disable humidity sensor
+    tool.sendline('char-write-req 0x3f 00')
+    tool.expect('\[LE\]>')
+    # disable barometric pressure sensor
+    tool.sendline('char-write-req 0x55 00')
+    tool.expect('\[LE\]>')
 
-    while True:
+while True:
 
-        # read POST result
-        tool.sendline('char-read-hnd 0x70')
-        tool.expect('descriptor: .*? \r') 
-        v = tool.after.split()
-        post = v[1]
+    try:
 
-        # read temperature sensor
-        tool.sendline('char-read-hnd 0x25')
-        tool.expect('descriptor: .*? \r') 
-        v = tool.after.split()
-        rawObjT = long(float.fromhex(v[2] + v[1]))
-        rawAmbT = long(float.fromhex(v[4] + v[3]))
-        (at, it) = calcTmp(rawAmbT, rawObjT)
+        print adr, " Trying to connect. You might need to press the side button ..."
 
-        # read humidity sensor
-        tool.sendline('char-read-hnd 0x3b')
-        tool.expect('descriptor: .*? \r') 
-        v = tool.after.split()
-        rawT = long(float.fromhex(v[2] + v[1]))
-        rawH = long(float.fromhex(v[4] + v[3]))
-        (ht, hu) = calcHum(rawT, rawH)
+        tool = pexpect.spawn('gatttool535 -b ' + adr + ' --interactive')
+        tool.expect('\[LE\]>')
+        tool.sendline('connect')
+        tool.expect('success')
 
-        # read barometric pressure sensor
-        tool.sendline('char-read-hnd 0x51')
-        tool.expect('descriptor: .*? \r') 
-        v = tool.after.split()
-        rawT = long(float.fromhex(v[2] + v[1]))
-        rawP = long(float.fromhex(v[4] + v[3]))
-        (pt, pr) = barometer.calc(rawT, rawP)
+        print adr, " Switching to a lower energy connection ..."
 
-        cnt = cnt + 1
+        # gatttool not really connects with enough 'low energy' so reconfigure
+        # the connection to the values preferred by SensorTag (see characteristic 0x2A04):
+        # i.e. min interval to 100ms and max interval to 200ms.
+        # By this the current needed for 'just being connected' in the SensorTag 
+        # drops from 0.35mA to 0.01mA.
+        cons = pexpect.run('hcitool con')
+        cons = cons.split("\r\n")
+        for con in cons:
+            if adr in con:
+                tok = con.split()
+                handle = tok[4]
+                state = tok[6]
+                error = pexpect.run('sudo hcitool lecup --handle ' + handle + ' --min 80 --max 160')
+                if error <> "":
+                    print "hcittool error: '" + error + "' (handle: " + handle + ", state: " + state + ")"
 
-        stamp = datetime.now().ctime()
-        act = 0
+        wait_timer = 0
+        duty_timer = 0
+        #wait_cycle = 3600
+        #duty_cycle = 180
+        wait_cycle = 300
+        duty_cycle = 60
 
+        while True:
+
+            start = time.time()
+
+            if wait_timer <= 0:
+                wait_timer = wait_cycle
+                duty_timer = duty_cycle
+                print adr, " Enabling sensors ..."
+                enable_sensors()
+                # wait for the sensors to become ready
+                time.sleep(1)
+
+            print adr, " Life tick ..."
+            # read POST result
+            tool.sendline('char-read-hnd 0x70')
+            tool.expect('descriptor: .*? \r') 
+            v = tool.after.split()
+            post = v[1]
+
+            if duty_timer > 0:
+                print adr, " Reading sensors ..."
+                # read humidity sensor
+                tool.sendline('char-read-hnd 0x3b')
+                tool.expect('descriptor: .*? \r') 
+                v = tool.after.split()
+                rawT = long(float.fromhex(v[2] + v[1]))
+                rawH = long(float.fromhex(v[4] + v[3]))
+                (ht, hu) = calcHum(rawT, rawH)
+                # read barometric pressure sensor
+                tool.sendline('char-read-hnd 0x51')
+                tool.expect('descriptor: .*? \r') 
+                v = tool.after.split()
+                rawT = long(float.fromhex(v[2] + v[1]))
+                rawP = long(float.fromhex(v[4] + v[3]))
+                (pt, pr) = barometer.calc(rawT, rawP)
+                stamp = datetime.now().ctime()
+                act = 0
+                log_values()
+
+            # SensorTag's preferred supervision timeout is 10000ms (see characteristic 0x2A04)
+            time.sleep(10)
+
+            elapsed = int(time.time() - start)
+            wait_timer = wait_timer - elapsed
+            if duty_timer > 0:
+                duty_timer = duty_timer - elapsed
+                if duty_timer < 0:
+                    print adr, " Disabling sensors ..."
+                    disable_sensors()
+                    duty_timer = 0
+
+    except KeyboardInterrupt:
+        tool.sendline('quit')
+        tool.close()
+        sys.exit()
+
+    except:
+        if handle != "":
+            pexpect.run('sudo hcitool ledc ' + handle)
+        tool.sendline('quit')
+        tool.close(force=True)
+        exc = exc + 1
+        act = 1
         log_values()
-
-        time.sleep(3)
-
-  except KeyboardInterrupt:
-    tool.sendline('quit')
-    tool.close()
-    sys.exit()
-
-  except:
-    if handle != "":
-        pexpect.run('sudo hcitool ledc ' + handle)
-    tool.sendline('quit')
-    tool.close(force=True)
-    exc = exc + 1
-    act = 1
-    log_values()
 
