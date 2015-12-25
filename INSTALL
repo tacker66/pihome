@@ -85,3 +85,8 @@ git clone https://github.com/benleb/PyGlow.git
 cd PyGlow && git checkout v0.2
 sudo python setup.py install
 
+Use thingspeak cloud logging:
+-----------------------------
+See https://thingspeak.com.
+thingspeak.py together with thingspeak.conf maps values to either 
+a thingspeak channel field or a bit within a channel field.

@@ -9,7 +9,7 @@ sleep 5
 #
 sudo python ./html.py &
 #
-#sudo python ./piglow.py &
+sudo python ./thingspeak.py /home/pi/thingspeak.conf
 #
-#sudo python ./thingspeak.py
+#sudo python ./piglow.py &
 #
