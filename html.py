@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 #
-# Copyright 2014-15 Thomas Ackermann
+# Copyright 2014-16 Thomas Ackermann
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ while True:
     hd = open(html, "w")
     hd.write('<html><head><title>\n')
     hd.write('pihome data\n')
-    hd.write('</title><meta http-equiv="refresh" content="20">\n')
+    hd.write('</title><meta http-equiv="refresh" content="10">\n')
     hd.write('<head><body>\n')
     hd.write('<h2>pihome data</h2>\n')
     files = sorted(glob.glob(path))
@@ -47,5 +47,5 @@ while True:
         hd.write('</table>\n')
     hd.write('</body></html>\n')
     hd.close()
-    time.sleep(5)
+    time.sleep(10)
     
