@@ -11,5 +11,5 @@ sudo python ./html.py &
 #
 sudo python ./thingspeak.py /home/pi/thingspeak.conf
 #
-#sudo python ./piglow.py &
+sudo python ./piglow.py &
 #
