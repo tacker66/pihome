@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 #
-# Copyright 2013-2015 Thomas Ackermann
+# Copyright 2013-2016 Thomas Ackermann
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -49,92 +49,83 @@ adr = sys.argv[1]
 
 logdir = "/tmp/pihome"
 try:
-  os.mkdir(logdir)
+    os.mkdir(logdir)
 except:
-  pass
+    pass
 
-cnt = 0
-rnd = 0
 val = 0
-err = 0
 exc = 0
 act = 0
 stamp = ""
 handle = ""
 
 def log_values():
-  print adr, " CNT %04d, RND 0x%02X, DATA 0x%02X, ERR %d, EXC %d, ACT %d" % (cnt, rnd, val, err, exc, act)
-  print adr, " STAMP '%s'" % stamp
+    print adr, " DATA 0x%02X, EXC %d, ACT %d" % (val, exc, act)
+    print adr, " STAMP '%s'" % stamp
 
-  data = open(logdir+"/"+adr, "w")
-  data.write("  RND 0x%02X\n" % rnd)
-  data.write(" DATA 0x%02X\n" % val)
-  data.write("  ERR %d\n" % err)
-  data.write("EXCPT %d\n" % exc)
-  data.write("ACTEX %d\n" % act)
-  data.write("STAMP '%s'\n" % stamp)
-  data.close()
+    data = open(logdir+"/"+adr, "w")
+    data.write(" DATA 0x%02X\n" % val)
+    data.write("EXCPT %d\n" % exc)
+    data.write("ACTEX %d\n" % act)
+    data.write("STAMP '%s'\n" % stamp)
+    data.close()
 
 while True:
 
-  try:
+    try:
 
-    print adr, " Trying to connect ..."
+        print adr, " Trying to connect ..."
 
-    tool = pexpect.spawn('gatttool535 -b ' + adr + ' --interactive')
-    tool.expect('\[LE\]>')
-    tool.sendline('connect')
-    tool.expect('success')
-
-    # find handle
-    cons = pexpect.run('hcitool con')
-    cons = cons.split("\r\n")
-    for con in cons:
-      if adr in con:
-        tok = con.split()
-        handle = tok[4]
-
-    # set baudrate to 9600
-    tool.sendline('char-write-cmd 0x19 00')
-    tool.expect('\[LE\]>')
-
-    while True:
-
-        rnd = random.randint(0, 255)
-
-        # send byte to BLEMini
-        tool.sendline('char-write-cmd 0x16 ' + ("%02X" % rnd))
+        tool = pexpect.spawn('gatttool535 -b ' + adr + ' --interactive')
         tool.expect('\[LE\]>')
+        tool.sendline('connect')
+        tool.expect('success')
+
+        # find handle
+        cons = pexpect.run('hcitool con')
+        cons = cons.split("\r\n")
+        for con in cons:
+            if adr in con:
+                tok = con.split()
+                handle = tok[4]
+
+        # set baudrate to 9600
+        tool.sendline('char-write-cmd 0x19 00')
+        tool.expect('\[LE\]>')
+
+        while True:
+
+            rnd = random.randint(0, 11)
+
+            # send byte to BLEMini
+            tool.sendline('char-write-cmd 0x16 ' + ("%02X" % rnd))
+            tool.expect('\[LE\]>')
         
-        # read byte/s from BLEMini
-        tool.sendline('char-read-hnd 0x12')
-        tool.expect('descriptor: .*? \r') 
-        v = tool.after.split()
-        val = int(float.fromhex(v[1]))
+            # read byte/s from BLEMini
+            tool.sendline('char-read-hnd 0x12')
+            tool.expect('descriptor: .*? \r') 
+            v = tool.after.split()
+            val = int(float.fromhex(v[1]))
 
-        cnt = cnt + 1
+            stamp = datetime.now().ctime()
+            act = 0
 
-        if val != rnd:
-            err = err + 1
+            log_values()
 
-        stamp = datetime.now().ctime()
-        act = 0
+            #time.sleep(3600)
+            time.sleep(300)
 
+    except KeyboardInterrupt:
+        tool.sendline('quit')
+        tool.close()
+        sys.exit()
+
+    except:
+        if handle != "":
+            pexpect.run('sudo hcitool ledc ' + handle)
+        tool.sendline('quit')
+        tool.close(force=True)
+        exc = exc + 1
+        act = 1
         log_values()
-
-        time.sleep(3)
-
-  except KeyboardInterrupt:
-    tool.sendline('quit')
-    tool.close()
-    sys.exit()
-
-  except:
-    if handle != "":
-        pexpect.run('sudo hcitool ledc ' + handle)
-    tool.sendline('quit')
-    tool.close(force=True)
-    exc = exc + 1
-    act = 1
-    log_values()
 
