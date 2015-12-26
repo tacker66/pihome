@@ -62,6 +62,9 @@ try:
                 fd.close()
             arm = arm + 1
 
+        if len(leds) == 0:
+            leds = [5, 11, 17]
+
         for i in range(0, 10):
             pyglow.set_leds(leds, intensity)
             pyglow.update_leds()
