@@ -95,7 +95,7 @@ while True:
 
         while True:
 
-            rnd = random.randint(0, 11)
+            rnd = random.randint(0, 10)
 
             # send byte to BLEMini
             tool.sendline('char-write-cmd 0x16 ' + ("%02X" % rnd))
