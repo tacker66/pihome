@@ -33,13 +33,13 @@ def read_config(file):
         if len(line) > 0 and line[0] != "#":
             tok = string.split(line, "=")
             config[string.strip(tok[0])] = string.strip(tok[1])
+
+if len(sys.argv) > 1:
+    read_config(sys.argv[1])
  
 def setBit(int_type, offset):
   mask = 1 << offset
   return(int_type | mask)
-
-if len(sys.argv) > 1:
-    read_config(sys.argv[1])
 
 while True:
     files = sorted(glob.glob(path))
