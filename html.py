@@ -22,10 +22,22 @@
 # and this script must be run as root.
 #
 
-import glob, string, time, os
+import glob, string, time, os, sys
 
 path = "/tmp/pihome/*"
 html = "/var/www/index.html"
+
+config = dict()
+def read_config(file):
+    fd = open(file)
+    for line in fd:
+        line = string.strip(line)
+        if len(line) > 0 and line[0] != "#":
+            tok = string.split(line, "=")
+            config[string.strip(tok[0])] = string.strip(tok[1])
+
+if len(sys.argv) > 1:
+    read_config(sys.argv[1])
 
 while True:
     hd = open(html, "w")
@@ -36,7 +48,11 @@ while True:
     hd.write('<h2>pihome data</h2>\n')
     files = sorted(glob.glob(path))
     for file in files:
-        hd.write('<h3>' + os.path.basename(file) + '</h3>')
+        device_id = os.path.basename(file)
+        if device_id not in config:
+            continue
+        device_name = config[device_id]
+        hd.write('<h3>' + device_id + ' (' + device_name + ')' + '</h3>')
         hd.write('<table border="1">\n')
         fd = open(file)
         for line in fd:
