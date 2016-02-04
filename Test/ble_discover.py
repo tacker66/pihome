@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 #
-# Copyright 2014-2015 Thomas Ackermann
+# Copyright 2014-2016 Thomas Ackermann
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -46,25 +46,27 @@ def read_string(handle):
 def read_property(handle):
   tool.sendline("char-read-hnd " + handle)
   tool.expect("descriptor: .*? \r")
-  prop = tool.after.split()[1]
-  val = int(prop, 16)
-  prop = prop + " = "
+  desc = tool.after.split()
+  val = int(desc[1], 16)
+  prop = ""
   if val & 0x01:
-    prop = prop + "? "
+    prop = prop + "broadcast, "
   if val & 0x02:
-    prop = prop + "read "
+    prop = prop + "read, "
   if val & 0x04:
-    prop = prop + "? "
+    prop = prop + "write request, "
   if val & 0x08:
-    prop = prop + "write "
+    prop = prop + "write, "
   if val & 0x10:
-    prop = prop + "notify "
+    prop = prop + "notify, "
   if val & 0x20:
-    prop = prop + "indicate "
+    prop = prop + "indicate, "
   if val & 0x40:
-    prop = prop + "? "
+    prop = prop + "signed write, "
   if val & 0x80:
-    prop = prop + "? "
+    prop = prop + "extended, "
+  hndl = str(hex(int(desc[2], 16) + 256 * int(desc[3], 16)))
+  prop = prop + "handle = " + hndl
   return prop
 
 def read_conprop(handle):
@@ -116,6 +118,8 @@ for line in lines:
     elif "2901-" in uuid:
       sys.stdout.write(handle + " :           description : ")
       sys.stdout.write(read_string(handle) + "\n")
+    elif "2902-" in uuid:
+      sys.stdout.write(handle + " : characteristic config : '" + uuid + "'" + "\n")
     elif "2a00-" in uuid:
       sys.stdout.write(handle + " :                  name : ")
       sys.stdout.write(read_string(handle) + "\n")
