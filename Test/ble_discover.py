@@ -66,7 +66,11 @@ def read_property(handle):
   if val & 0x80:
     prop = prop + "extended, "
   hndl = str(hex(int(desc[2], 16) + 256 * int(desc[3], 16)))
-  prop = prop + "handle = " + hndl
+  idx = 4
+  if len(desc) == 20:
+   idx = 16
+  uuid = "0x" + desc[idx+1] + desc[idx]
+  prop = prop + "handle=" + hndl + ", uuid=" + uuid
   return prop
 
 def read_conprop(handle):
