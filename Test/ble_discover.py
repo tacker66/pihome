@@ -99,7 +99,7 @@ sys.stdout.write("Starting discovery (this may take some time) ...\n")
 # message is printed by gatttool, so we have to greedily read
 # everything until pexpect timeouts
 tool.sendline('char-desc')
-tool.expect(['WILLNOTMATCH', pexpect.TIMEOUT], timeout=30)
+tool.expect(['WILLNOTMATCH', pexpect.TIMEOUT], timeout=20)
 lines = tool.before.split('\r')
 
 sys.stdout.write("HANDLE : VALUE\n")
