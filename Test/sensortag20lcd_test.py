@@ -55,8 +55,6 @@ while True:
     tool.sendline('connect')
     tool.expect('success')
 
-
-
     tool.sendline('char-write-req 4e 00')
     tool.expect('\[LE\]>')
     tool.sendline('char-write-req 50 01')
