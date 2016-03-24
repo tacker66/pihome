@@ -50,8 +50,9 @@ while True:
     for file in files:
         device_id = os.path.basename(file)
         if device_id not in config:
-            continue
-        device_name = config[device_id]
+            device_name = "unknown"
+        else:
+            device_name = config[device_id]
         hd.write('<h3>' + device_id + ' (' + device_name + ')' + '</h3>')
         hd.write('<table border="1">\n')
         fd = open(file)
