@@ -43,7 +43,7 @@ def setBit(int_type, offset):
 
 while True:
     files = sorted(glob.glob(path))
-    values = {'key' : config["KEY"]}
+    values = {"key" : config["KEY"]}
     for file in files:
         device_id = os.path.basename(file)
         if device_id not in config:
@@ -56,19 +56,19 @@ while True:
             full_symbol = device_name + "." + symbol
             if full_symbol in config:
                 value = tok[1]
-                if '0x' in value:
+                if "0x" in value:
                     value = float.fromhex(value)
                 else:
                     value = float(value)
                 field_num = config[full_symbol]
                 if "." not in field_num:
-                    field_name = 'field' + config[device_name + "." + symbol]
+                    field_name = "field" + config[device_name + "." + symbol]
                     values[field_name] = str(value)
                 else:
                     tok = string.strip(field_num).split(".")
                     field_num = tok[0]
                     field_bit = tok[1]
-                    field_name = 'field' + field_num
+                    field_name = "field" + field_num
                     if field_name not in values:
                         values[field_name] = 0
                     if value > 0:
@@ -83,13 +83,13 @@ while True:
         response = urllib2.urlopen(req, None, 5)
         html_string = response.read()
         response.close()
-        log = log + 'Response: ' + html_string
+        log = log + "Response: " + html_string
     except urllib2.HTTPError, e:
-        log = log + 'Server could not fulfill the request. Error code: ' + str(e.code)
+        log = log + "Server could not fulfill the request. Error code: " + str(e.code)
     except urllib2.URLError, e:
-        log = log + 'Failed to reach server. Reason: ' + str(e.reason)
+        log = log + "Failed to reach server. Reason: " + str(e.reason)
     except:
-        log = log + 'Unknown error' 
+        log = log + "Unknown error" 
     print log
 
     #time.sleep(3600)
