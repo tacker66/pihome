@@ -69,7 +69,7 @@ def log_values():
   print adr, " AMTMP %.1f" % at
   print adr, " HMTMP %.1f" % ht
   print adr, " BRTMP %.1f" % pt
-  print adr, " HUMID %.0f" % hu
+  print adr, " HUMID %.1f" % hu
   print adr, " BAROM %.0f" % pr
   print adr, " EXCPT %d" % exc
   print adr, " ACTEX %d" % act
@@ -81,7 +81,7 @@ def log_values():
   data.write("AMTMP %.1f\n" % at)
   data.write("HMTMP %.1f\n" % ht)
   data.write("BRTMP %.1f\n" % pt)
-  data.write("HUMID %.0f\n" % hu)
+  data.write("HUMID %.1f\n" % hu)
   data.write("BAROM %.0f\n" % pr)
   data.write("EXCPT %d\n" % exc)
   data.write("ACTEX %d\n" % act)
