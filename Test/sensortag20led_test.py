@@ -17,13 +17,13 @@
 #
 
 #
-# SensorTag 2.0 v1.2 with LED DevPack handle ranges 
+# SensorTag 2.0 v1.3 with LED DevPack uuids and handle ranges
 #
-#     Red: set 0x21 with intensity (1 byte)
-#   Green: set 0x24 with intensity (1 byte)
-#    Blue: set 0x27 with intensity (1 byte)
-#   White: set 0x2a with intensity (1 byte)
-#    RGBW: set 0x2d with intensities (4 bytes)
+#     Red (0xffb1): set 0x40 with intensity (1 byte)
+#   Green (0xffb2): set 0x43 with intensity (1 byte)
+#    Blue (0xffb3): set 0x46 with intensity (1 byte)
+#   White (0xffb4): set 0x49 with intensity (1 byte)
+#    RGBW (0xffb5): set 0x4c with intensities (4 bytes)
 #
 
 import os
@@ -49,7 +49,7 @@ while True:
     intensity = '03'
     while True:
 
-        for led in ['0x21', '0x24', '0x27', '0x2a']:
+        for led in ['0x40', '0x43', '0x46', '0x49']:
             cmd = 'char-write-req ' + led + ' '
             tool.sendline(cmd + intensity)
             tool.expect('\[LE\]>')

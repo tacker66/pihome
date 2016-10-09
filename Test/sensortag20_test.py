@@ -17,19 +17,14 @@
 #
 
 #
-# SensorTag 2.0 v1.2 handle ranges 
+# SensorTag 2.0 v1.3 uuids and handle ranges
 #
-#   Temperature: 0x1f - 0x26 (set 0x24 = 01; read 0x21)
-#      Humidity: 0x27 - 0x2e (set 0x2c = 01; read 0x29)
-#     Barometer: 0x2f - 0x36 (set 0x34 = 01; read 0x31)
-#      Movement: 0x37 - 0x3e
-#     Luxometer: 0x3f - 0x46
-#          Keys: 0x47 - 0x4b
-#           IOs: 0x4c - 0x50 (test mode: set 0x50 = 02; read 0x4e; 
-#                             bits: 0 flash ios move press light hum temp; 0x7f means "OK")
-#     Registers: 0x51 - 0x58
-#    Connection: 0x59 - 0x60
-#           OAD: 0x61 - 0x69
+#   Temperature (0xaa01): 0x22 - 0x29 (set 0x27 = 01; read 0x24)
+#      Humidity (0xaa21): 0x2a - 0x31 (set 0x2f = 01; read 0x2c)
+#     Barometer (0xaa41): 0x32 - 0x39 (set 0x37 = 01; read 0x34)
+#           IOs (0xaa65): 0x4f - 0x53 (test mode: set 0x53 = 02; read 0x51;
+#                                      bits: 0 flash ios move press light hum temp;
+#                                      0x7f means "OK")
 #
 
 import os
@@ -120,19 +115,19 @@ while True:
     print adr, " Enabling sensors ..."
 
     # enable test mode
-    tool.sendline('char-write-req 0x50 02')
+    tool.sendline('char-write-req 0x53 02')
     tool.expect('\[LE\]>')
 
     # enable temperature sensor
-    tool.sendline('char-write-req 0x24 01')
+    tool.sendline('char-write-req 0x27 01')
     tool.expect('\[LE\]>')
 
     # enable humidity sensor
-    tool.sendline('char-write-req 0x2c 01')
+    tool.sendline('char-write-req 0x2f 01')
     tool.expect('\[LE\]>')
 
     # enable barometric pressure sensor
-    tool.sendline('char-write-req 0x34 01')
+    tool.sendline('char-write-req 0x37 01')
     tool.expect('\[LE\]>')
 
     # wait for the sensors to become ready
@@ -141,13 +136,13 @@ while True:
     while True:
 
         # read POST result
-        tool.sendline('char-read-hnd 0x4e')
+        tool.sendline('char-read-hnd 0x51')
         tool.expect('descriptor: .*? \r') 
         v = tool.after.split()
         post = v[1]
 
         # read temperature sensor
-        tool.sendline('char-read-hnd 0x21')
+        tool.sendline('char-read-hnd 0x24')
         tool.expect('descriptor: .*? \r') 
         v = tool.after.split()
         rawObjT = long(float.fromhex(v[2] + v[1]))
@@ -155,7 +150,7 @@ while True:
         (at, it) = calcTmp(rawAmbT, rawObjT)
 
         # read humidity sensor
-        tool.sendline('char-read-hnd 0x29')
+        tool.sendline('char-read-hnd 0x2c')
         tool.expect('descriptor: .*? \r') 
         v = tool.after.split()
         rawT = long(float.fromhex(v[2] + v[1]))
@@ -163,7 +158,7 @@ while True:
         (ht, hu) = calcHum(rawT, rawH)
 
         # read barometric pressure sensor
-        tool.sendline('char-read-hnd 0x31')
+        tool.sendline('char-read-hnd 0x34')
         tool.expect('descriptor: .*? \r') 
         v = tool.after.split()
         rawT = long(float.fromhex(v[3] + v[2] + v[1]))

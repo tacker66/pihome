@@ -17,14 +17,14 @@
 #
 
 #
-# SensorTag 2.0 v1.2 with LCD DevPack handle ranges 
+# SensorTag 2.0 v1.3 with LCD DevPack uuids and handle ranges
 #
-#   IO Config: 0x50 (local mode "00", remote mode "01", test mode "02")
-#     IO Data: 0x4e (in remote mode: bit 0 "Red", bit 1 "Green", bit 2 "Buzzer")
-#  LCD String: 0x5b (1-16 chars)
-#  LCD Config: 0x5d (off "01", on "02", clear all "03", clear row "04 <row>",
-#                    invert "05, set row col "06 <row> <col>")
-#                    settings for row and col not working as of FW v1.2
+#   IO Config (0xaa65): 0x43 (local mode "00", remote mode "01", test mode "02")
+#     IO Data (0xaa66): 0x41 (in remote mode: bit 0 "Red", bit 1 "Green", bit 2 "Buzzer")
+#  LCD String (0xad01): 0x65 (1-16 chars)
+#  LCD Config (0xad02): 0x67 (off "01", on "02", clear all "03", clear row "04 <row>",
+#                             invert "05, set row col "06 <row> <col>")
+#                             settings for row and col not working as of FW v1.3
 #
 
 import os
@@ -41,7 +41,7 @@ def write_lcd(msg):
     chrs = ''
     for chr in list(msg):
         chrs = chrs + hex(ord(chr))[2:]
-    tool.sendline('char-write-req 5b ' + chrs)
+    tool.sendline('char-write-req 65 ' + chrs)
     tool.expect('\[LE\]>')
 
 while True:
@@ -55,9 +55,9 @@ while True:
     tool.sendline('connect')
     tool.expect('success')
 
-    tool.sendline('char-write-req 4e 00')
+    tool.sendline('char-write-req 41 00')
     tool.expect('\[LE\]>')
-    tool.sendline('char-write-req 50 01')
+    tool.sendline('char-write-req 43 01')
     tool.expect('\[LE\]>')
 
     msg = dict()
@@ -69,7 +69,7 @@ while True:
 
         for out in sorted(msg):
             write_lcd(msg[out])
-            cmd = 'char-write-req 4e ' + out
+            cmd = 'char-write-req 41 ' + out
             tool.sendline(cmd)
             tool.expect('\[LE\]>')
             time.sleep(wait)
@@ -83,8 +83,6 @@ while True:
     sys.exit()
 
   except:
-#    if handle != "":
-#        pexpect.run('sudo hcitool ledc ' + handle)
     tool.sendline('quit')
     tool.close(force=True)
 
