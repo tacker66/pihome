@@ -94,7 +94,7 @@ while True:
 
     print adr, " Trying to connect. You might need to press the side button ..."
 
-    tool = pexpect.spawn('gatttool535 -b ' + adr + ' --interactive')
+    tool = pexpect.spawn('gatttool542 -b ' + adr + ' --interactive')
     tool.expect('\[LE\]>')
     tool.sendline('connect')
     tool.expect('success')

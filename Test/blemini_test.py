@@ -19,7 +19,7 @@
 #
 # Read digital inputs from a RedBearLabs BLEmini. 
 # BLEmini is a BLE (Bluetooth low energy) device so by
-# automating gatttool (from BlueZ 5.35) with
+# automating gatttool (from BlueZ 5.42) with
 # pexpect (3.1) we are able to read and write values.
 #
 # Usage: blemini_test.py BLUETOOTH_ADR
@@ -81,7 +81,7 @@ while True:
 
     print adr, " Trying to connect ..."
 
-    tool = pexpect.spawn('gatttool535 -b ' + adr + ' --interactive')
+    tool = pexpect.spawn('gatttool542 -b ' + adr + ' --interactive')
     tool.expect('\[LE\]>')
     tool.sendline('connect')
     tool.expect('success')

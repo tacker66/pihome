@@ -1,2 +1,2 @@
-gatttool535 -b B0:B4:48:BF:D9:00 --interactive
+gatttool542 -b B0:B4:48:BF:D9:00 --interactive
 
