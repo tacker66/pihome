@@ -43,7 +43,7 @@ while True:
     hd = open(html, "w")
     hd.write('<html><head><title>\n')
     hd.write('pihome data\n')
-    hd.write('</title><meta http-equiv="refresh" content="10">\n')
+    hd.write('</title><meta http-equiv="refresh" content="30">\n')
     hd.write('<head><body>\n')
     hd.write('<h2>pihome data</h2>\n')
     files = sorted(glob.glob(path))
@@ -64,5 +64,5 @@ while True:
         hd.write('</table>\n')
     hd.write('</body></html>\n')
     hd.close()
-    time.sleep(10)
+    time.sleep(30)
     

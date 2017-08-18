@@ -92,5 +92,6 @@ while True:
         log = log + "Unknown error" 
     print log
 
-    #time.sleep(3600)
-    time.sleep(300)
+    time.sleep(3600)
+    #time.sleep(300)
+

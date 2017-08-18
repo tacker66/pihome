@@ -3,7 +3,7 @@ sudo python ./sensortag_run.py BC:6A:29:C3:6A:D0 &
 #
 sudo python ./sensortag_run.py BC:6A:29:AB:EC:A8 &
 #
-sudo python ./blemini_run.py 00:17:EA:91:BC:6D &
+#sudo python ./blemini_run.py 00:17:EA:91:BC:6D &
 #
 sudo python ./html.py /home/pi/thingspeak.conf &
 #

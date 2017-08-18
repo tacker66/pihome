@@ -65,13 +65,14 @@ try:
         if len(leds) == 0:
             leds = [5, 11, 17]
 
-        for i in range(0, 10):
+        for i in range(0, 15):
             pyglow.set_leds(leds, intensity)
             pyglow.update_leds()
-            time.sleep(0.5)
+            time.sleep(1)
             pyglow.set_leds(leds, 0)
             pyglow.update_leds()
-            time.sleep(0.5)
+            time.sleep(1)
 
 except KeyboardInterrupt:
     pyglow.all(0)
+
