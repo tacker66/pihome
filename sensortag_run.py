@@ -148,7 +148,7 @@ while True:
 
         wait_timer = 0
         duty_timer = 0
-        wait_cycle = 3600
+        wait_cycle = 1800
         #wait_cycle = 300
         duty_cycle = 30
 
