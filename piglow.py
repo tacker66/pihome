@@ -68,7 +68,7 @@ try:
         for i in range(0, 15):
             pyglow.set_leds(leds, intensity)
             pyglow.update_leds()
-            time.sleep(1)
+            time.sleep(0.1)
             pyglow.set_leds(leds, 0)
             pyglow.update_leds()
             time.sleep(1)
