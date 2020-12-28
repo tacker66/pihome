@@ -1,16 +1,27 @@
 
-Install latest 3.x kernel (3.18.16+) on a Raspberry Pi B with Raspbian Wheezy
-=============================================================================
+Raspberry Pi OS (02.12.2020)
+###########################
+
+To install pihome "master":
+---------------------------
+
+TODO
+
+
+Raspbian Wheezy
+###############
+
+To install pihome v1.1:
+-----------------------
+
+Install latest 3.x kernel (3.18.16+)
+====================================
 sudo apt-get update
 sudo apt-get upgrade
 sudo rpi-update d3e6f4a2
 
-
-Install BlueZ and pexpect on Raspbery Pi with Raspbian
-======================================================
-
-Install BlueZ 5.42:
--------------------
+Install BlueZ 5.42
+==================
 sudo apt-get install libdbus-1-dev libglib2.0-dev automake libudev-dev libical-dev libreadline-dev
 wget https://www.kernel.org/pub/linux/bluetooth/bluez-5.42.tar.gz
 tar xvf bluez-5.42.tar.gz
@@ -20,17 +31,37 @@ make
 sudo make install
 sudo cp attrib/gatttool /usr/local/bin/gatttool542
 
-Install pexpect 3.3:
---------------------
+Install pexpect 3.3
+===================
 sudo apt-get install python-dev
 git clone https://github.com/pexpect/pexpect.git
 cd pexpect
 git checkout 3.3
 sudo python setup.py install
 
+Install lighttpd
+================
+sudo apt-get install lighttpd
+
+Install PiGlow
+==============
+sudo raspi-config (navigate to Advanced Options, then I2C and answer Yes to both questions)
+sudo apt-get install python-smbus libi2c-dev
+curl get.pimoroni.com/i2c | bash
+reboot!
+git clone https://github.com/benleb/PyGlow.git
+cd PyGlow && git checkout v0.2
+sudo python setup.py install
+
+Use thingspeak cloud logging
+============================
+See https://thingspeak.com.
+thingspeak.py together with thingspeak.conf maps values to either 
+a thingspeak channel field or a bit within a channel field.
+
 
 Texas Instruments SensorTag
-===========================
+###########################
 
 Install SensorTag-FW:
 ---------------------
@@ -42,55 +73,32 @@ Install latest SensorTag firmware (V1.3) with iOS SensorTag-App.
 
 
 RedBearLab BLEMini
-==================
+##################
 
-Install Biscuit-FW for BLEMini:
--------------------------------
+Install Biscuit-FW
+==================
 See http://http://redbearlab.com/blemini/
 and https://github.com/RedBearLab/Biscuit.git.
 Install Biscuit-UART_20140409 from revision 1f6832fc.
 
 
-Texas Instruments Launchpad
-===========================
+Texas Instruments Launchpad MSP430G2552
+#######################################
 
-Download sketch ./Launchpad/blemini_digitalread to Launchpad with MSP430G2552:
-------------------------------------------------------------------------------
+Download sketch ./Launchpad/blemini_digitalread to Launchpad with MSP430G2552
+=============================================================================
 Download sketch with Energia 0101E0015.
 
 
-Arduino
-=======
+Arduino Nano
+############
 
-Download sketch ./Arduino/blemini_digitalread to Arduino Nano:
---------------------------------------------------------------
+Download sketch ./Arduino/blemini_digitalread to Arduino
+========================================================
 Download sketch with Arduino 1.0.5.
 
 
-Wiring of Arduino Nano / Launchpad with BLEMini:
-================================================
+Wiring of Arduino Nano / Launchpad with BLEMini
+###############################################
+
 TODO
-
-
-Connect to the outside world
-============================
-
-Install lighttpd:
------------------
-sudo apt-get install lighttpd
-
-Install PiGlow:
----------------
-sudo raspi-config (navigate to Advanced Options, then I2C and answer Yes to both questions)
-sudo apt-get install python-smbus libi2c-dev
-curl get.pimoroni.com/i2c | bash
-reboot!
-git clone https://github.com/benleb/PyGlow.git
-cd PyGlow && git checkout v0.2
-sudo python setup.py install
-
-Use thingspeak cloud logging:
------------------------------
-See https://thingspeak.com.
-thingspeak.py together with thingspeak.conf maps values to either 
-a thingspeak channel field or a bit within a channel field.
