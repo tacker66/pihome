@@ -1,11 +1,17 @@
 
 Raspberry Pi OS (02.12.2020)
-###########################
+############################
 
 To install pihome "master":
 ---------------------------
 
-TODO
+Install latest bluez, pexpect, lighttpd with package manager
+
+Install Enviro Plus
+===================
+git clone https://github.com/pimoroni/enviroplus-python enviro
+cd enviro
+sudo ./install.sh
 
 
 Raspbian Wheezy
@@ -53,9 +59,10 @@ git clone https://github.com/benleb/PyGlow.git
 cd PyGlow && git checkout v0.2
 sudo python setup.py install
 
+
 Use thingspeak cloud logging
-============================
-See https://thingspeak.com.
+############################
+See https://thingspeak.com
 thingspeak.py together with thingspeak.conf maps values to either 
 a thingspeak channel field or a bit within a channel field.
 
@@ -102,3 +109,4 @@ Wiring of Arduino Nano / Launchpad with BLEMini
 ###############################################
 
 TODO
+
