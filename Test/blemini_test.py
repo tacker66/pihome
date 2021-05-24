@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 #
 # Copyright 2013-2021 Thomas Ackermann
@@ -62,8 +62,8 @@ stamp = ""
 handle = ""
 
 def log_values():
-  print adr, " CNT %04d, RND 0x%02X, DATA 0x%02X, ERR %d, EXC %d, ACT %d" % (cnt, rnd, val, err, exc, act)
-  print adr, " STAMP '%s'" % stamp
+  print(adr, " CNT %04d, RND 0x%02X, DATA 0x%02X, ERR %d, EXC %d, ACT %d" % (cnt, rnd, val, err, exc, act))
+  print(adr, " STAMP '%s'" % stamp)
 
   data = open(logdir+"/"+adr, "w")
   data.write("  RND 0x%02X\n" % rnd)
@@ -78,15 +78,15 @@ while True:
 
   try:
 
-    print adr, " Trying to connect ..."
+    print(adr, " Trying to connect ...")
 
-    tool = pexpect.spawn('gatttool -b ' + adr + ' --interactive')
+    tool = pexpect.spawn('gatttool -b ' + adr + ' --interactive', encoding='utf-8')
     tool.expect('\[LE\]>')
     tool.sendline('connect')
     tool.expect('success')
 
     # find handle
-    cons = pexpect.run('hcitool con')
+    cons = pexpect.run('hcitool con', encoding='utf-8')
     cons = cons.split("\r\n")
     for con in cons:
       if adr in con:
@@ -130,7 +130,7 @@ while True:
 
   except:
     if handle != "":
-        pexpect.run('sudo hcitool ledc ' + handle)
+        pexpect.run('sudo hcitool ledc ' + handle, encoding='utf-8)
     tool.sendline('quit')
     tool.close(force=True)
     exc = exc + 1

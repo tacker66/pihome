@@ -89,9 +89,9 @@ class Barometer:
     def calcBarTmp(self, raw_temp):
         c1 = self.m_barCalib.c1
         c2 = self.m_barCalib.c2
-        val = long((c1 * raw_temp) * 100)
+        val = int((c1 * raw_temp) * 100)
         temp = val >> 24
-        val = long(c2 * 100)
+        val = int(c2 * 100)
         temp += (val >> 10)
         return float(temp) / 100.0
 
@@ -111,16 +111,16 @@ class Barometer:
         c7 = self.m_barCalib.c7
         c8 = self.m_barCalib.c8
         # Sensitivity
-        s = long(c3)
-        val = long(c4 * Tr)
+        s = int(c3)
+        val = int(c4 * Tr)
         s += (val >> 17)
-        val = long(c5 * Tr * Tr)
+        val = int(c5 * Tr * Tr)
         s += (val >> 34)
         # Offset
-        o = long(c6) << 14
-        val = long(c7 * Tr)
+        o = int(c6) << 14
+        val = int(c7 * Tr)
         o += (val >> 3)
-        val = long(c8 * Tr * Tr)
+        val = int(c8 * Tr * Tr)
         o += (val >> 19)
         # Pressure (Pa)
         pres = ((s * Pr) + o) >> 14

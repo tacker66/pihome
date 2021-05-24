@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 #
 # Copyright 2014-2021 Thomas Ackermann
@@ -86,14 +86,14 @@ def read_conprop(handle):
   return ret_str
 
 adr = sys.argv[1]
-tool = pexpect.spawn('gatttool -b ' + adr + ' --interactive')
-tool.expect('\[LE\]>')
+print("Trying to connect to '" + adr + "' (device must be advertising) ...")
 
-sys.stdout.write("Trying to connect to '" + adr + "' (device must be advertising) ...\n")
+tool = pexpect.spawn('gatttool -b ' + adr + ' --interactive', encoding='utf-8')
+tool.expect('\[LE\]>')
 tool.sendline('connect')
 tool.expect('success')
 
-sys.stdout.write("Starting discovery (this may take some time) ...\n")
+print("Starting discovery (this may take some time) ...")
 
 # char-desc is running asynchronously and no kind of 'finished'
 # message is printed by gatttool, so we have to greedily read
@@ -102,8 +102,8 @@ tool.sendline('char-desc')
 tool.expect(['WILLNOTMATCH', pexpect.TIMEOUT], timeout=20)
 lines = tool.before.split('\r')
 
-sys.stdout.write("HANDLE : VALUE\n")
-sys.stdout.write("--------------\n")
+print("HANDLE : VALUE")
+print("--------------")
 
 for line in lines:
   if "handle:" in line:

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 #
 # Copyright 2016-2021 Thomas Ackermann
@@ -36,7 +36,7 @@ adr = sys.argv[1]
 
 def write_lcd(msg):
     msg = msg[:16]
-    print msg
+    print(msg)
     msg = msg.center(16)
     chrs = ''
     for chr in list(msg):
@@ -48,9 +48,9 @@ while True:
 
   try:
 
-    print adr, "Trying to connect. You might need to press the side button ..."
+    print(adr, "Trying to connect. You might need to press the side button ...")
 
-    tool = pexpect.spawn('gatttool -b ' + adr + ' --interactive')
+    tool = pexpect.spawn('gatttool -b ' + adr + ' --interactive', encoding='utf-8')
     tool.expect('\[LE\]>')
     tool.sendline('connect')
     tool.expect('success')

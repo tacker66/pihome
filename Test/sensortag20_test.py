@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 #
 # Copyright 2016-2021 Thomas Ackermann
@@ -58,17 +58,17 @@ stamp = ""
 handle = ""
 
 def log_values():
-  print adr, "   CNT %d" % cnt
-  print adr, "  POST 0x%s" % post
-  print adr, " IRTMP %.1f" % it
-  print adr, " AMTMP %.1f" % at
-  print adr, " HMTMP %.1f" % ht
-  print adr, " BRTMP %.1f" % pt
-  print adr, " HUMID %.1f" % hu
-  print adr, " BAROM %.0f" % pr
-  print adr, " EXCPT %d" % exc
-  print adr, " ACTEX %d" % act
-  print adr, " STAMP '%s'" % stamp
+  print(adr, "   CNT %d" % cnt)
+  print(adr, "  POST 0x%s" % post)
+  print(adr, " IRTMP %.1f" % it)
+  print(adr, " AMTMP %.1f" % at)
+  print(adr, " HMTMP %.1f" % ht)
+  print(adr, " BRTMP %.1f" % pt)
+  print(adr, " HUMID %.1f" % hu)
+  print(adr, " BAROM %.0f" % pr)
+  print(adr, " EXCPT %d" % exc)
+  print(adr, " ACTEX %d" % act)
+  print(adr, " STAMP '%s'" % stamp)
 
   data = open(logdir+"/"+adr, "w")
   data.write(" POST 0x%s\n" % post)
@@ -87,32 +87,32 @@ while True:
 
   try:
 
-    print adr, " Trying to connect. You might need to press the side button ..."
+    print(adr, " Trying to connect. You might need to press the side button ...")
 
-    tool = pexpect.spawn('gatttool -b ' + adr + ' --interactive')
+    tool = pexpect.spawn('gatttool -b ' + adr + ' --interactive', encoding='utf-8')
     tool.expect('\[LE\]>')
     tool.sendline('connect')
     tool.expect('success')
 
-    print adr, " Switching to a lower energy connection ..."
+    print(adr, " Switching to a lower energy connection ...")
 
     # gatttool not really connects with enough 'low energy' so reconfigure
     # the connection to the values preferred by SensorTag (see characteristic 0x2A04):
     # i.e. min interval to 100ms and max interval to 200ms.
     # By this the current needed for 'just being connected' in the SensorTag 
     # drops from 0.35mA to 0.01mA.
-    cons = pexpect.run('hcitool con')
-    cons = cons.split("\r\n")
+    cons = pexpect.run('hcitool con', encoding='utf-8')
+    cons = cons.split('\r\n')
     for con in cons:
       if adr in con:
         tok = con.split()
         handle = tok[4]
         state = tok[6]
-        error = pexpect.run('sudo hcitool lecup --handle ' + handle + ' --min 80 --max 160')
-        if error <> "":
-          print "hcittool error: '" + error + "' (handle: " + handle + ", state: " + state + ")"
+        error = pexpect.run('sudo hcitool lecup --handle ' + handle + ' --min 80 --max 160', encoding='utf-8')
+        if error != "":
+          print("hcittool error: '" + error + "' (handle: " + handle + ", state: " + state + ")")
 
-    print adr, " Enabling sensors ..."
+    print(adr, " Enabling sensors ...")
 
     # enable test mode
     tool.sendline('char-write-req 0x53 02')
@@ -145,24 +145,24 @@ while True:
         tool.sendline('char-read-hnd 0x24')
         tool.expect('descriptor: .*? \r') 
         v = tool.after.split()
-        rawObjT = long(float.fromhex(v[2] + v[1]))
-        rawAmbT = long(float.fromhex(v[4] + v[3]))
+        rawObjT = int(float.fromhex(v[2] + v[1]))
+        rawAmbT = int(float.fromhex(v[4] + v[3]))
         (at, it) = calcTmp(rawAmbT, rawObjT)
 
         # read humidity sensor
         tool.sendline('char-read-hnd 0x2c')
         tool.expect('descriptor: .*? \r') 
         v = tool.after.split()
-        rawT = long(float.fromhex(v[2] + v[1]))
-        rawH = long(float.fromhex(v[4] + v[3]))
+        rawT = int(float.fromhex(v[2] + v[1]))
+        rawH = int(float.fromhex(v[4] + v[3]))
         (ht, hu) = calcHum(rawT, rawH)
 
         # read barometric pressure sensor
         tool.sendline('char-read-hnd 0x34')
         tool.expect('descriptor: .*? \r') 
         v = tool.after.split()
-        rawT = long(float.fromhex(v[3] + v[2] + v[1]))
-        rawP = long(float.fromhex(v[6] + v[5] + v[4]))
+        rawT = int(float.fromhex(v[3] + v[2] + v[1]))
+        rawP = int(float.fromhex(v[6] + v[5] + v[4]))
         (pt, pr) = calcBar(rawT, rawP)
 
         cnt = cnt + 1
@@ -181,10 +181,9 @@ while True:
 
   except:
     if handle != "":
-        pexpect.run('sudo hcitool ledc ' + handle)
+        pexpect.run('sudo hcitool ledc ' + handle, encoding='utf-8')
     tool.sendline('quit')
     tool.close(force=True)
     exc = exc + 1
     act = 1
-    log_values()
 

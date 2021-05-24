@@ -1,13 +1,13 @@
 #
-sudo python ./sensortag_run.py BC:6A:29:C3:6A:D0 &
+sudo python3 ./sensortag_run.py BC:6A:29:C3:6A:D0 &
 #
-sudo python ./sensortag_run.py BC:6A:29:AB:EC:A8 &
+sudo python3 ./sensortag_run.py BC:6A:29:AB:EC:A8 &
 #
-#sudo python ./blemini_run.py 00:17:EA:91:BC:6D &
+#sudo python3 ./blemini_run.py 00:17:EA:91:BC:6D &
 #
-sudo python ./html.py /home/pi/thingspeak.conf &
+sudo python3 ./html.py /home/pi/thingspeak.conf &
 #
-sudo python ./thingspeak.py /home/pi/thingspeak.conf &
+sudo python3 ./thingspeak.py /home/pi/thingspeak.conf &
 #
-sudo python ./piglow.py &
+sudo python3 ./piglow.py &
 #
