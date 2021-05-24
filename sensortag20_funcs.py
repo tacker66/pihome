@@ -1,5 +1,5 @@
 #
-# Copyright 2016 Thomas Ackermann
+# Copyright 2016-2021 Thomas Ackermann
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.

@@ -1,6 +1,6 @@
 #
 # Copyright 2013 Michael Saunby
-# Copyright 2013-2014 Thomas Ackermann
+# Copyright 2013-2021 Thomas Ackermann
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.

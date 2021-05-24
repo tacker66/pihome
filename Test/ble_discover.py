@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 #
-# Copyright 2014-2016 Thomas Ackermann
+# Copyright 2014-2021 Thomas Ackermann
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -86,7 +86,7 @@ def read_conprop(handle):
   return ret_str
 
 adr = sys.argv[1]
-tool = pexpect.spawn('gatttool542 -b ' + adr + ' --interactive')
+tool = pexpect.spawn('gatttool -b ' + adr + ' --interactive')
 tool.expect('\[LE\]>')
 
 sys.stdout.write("Trying to connect to '" + adr + "' (device must be advertising) ...\n")

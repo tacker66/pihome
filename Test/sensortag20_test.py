@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 #
-# Copyright 2016 Thomas Ackermann
+# Copyright 2016-2021 Thomas Ackermann
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -89,7 +89,7 @@ while True:
 
     print adr, " Trying to connect. You might need to press the side button ..."
 
-    tool = pexpect.spawn('gatttool542 -b ' + adr + ' --interactive')
+    tool = pexpect.spawn('gatttool -b ' + adr + ' --interactive')
     tool.expect('\[LE\]>')
     tool.sendline('connect')
     tool.expect('success')
