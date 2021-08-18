@@ -5,11 +5,21 @@ Raspberry Pi OS (02.12.2020)
 To install pihome "master":
 ---------------------------
 
-Install latest bluez, pexpect, lighttpd with package manager
+Install with "Add / Remove Software"
+====================================
+bluez, pexpect, lighttpd, croniter
+
+Install with "pip3 install -U"
+==============================
+sqlitedict
+
+Install homematicip-rest-api
+============================
+See https://homematicip-rest-api.readthedocs.io/en/latest/gettingstarted.html
 
 Install Enviro Plus
 ===================
-git clone https://github.com/pimoroni/enviroplus-python enviro
+git clone https://github.com/pimoroni/enviroplus-python.git enviro
 cd enviro
 sudo ./install.sh
 
