@@ -1,5 +1,5 @@
 #
-# Copyright 2016-2021 Thomas Ackermann
+# Copyright 2016-2023 Thomas Ackermann
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
 #
 
 #
-# Algorithms below are from 
-# http://processors.wiki.ti.com/index.php/CC2650_SensorTag_User's_Guide#Gatt_Server
+# Algorithms below are from (partly adapted)
+# https://web.archive.org/web/20210115074522/http://processors.wiki.ti.com/index.php/CC2650_SensorTag_User's_Guide
 #
 
 def calcTmp(ambT, objT):
