@@ -17,7 +17,7 @@
 #
 
 #
-# Update a thingspeak channel 
+# Update a thingspeak channel
 #
 
 import glob, string, time, os, sys
@@ -29,14 +29,14 @@ config = dict()
 def read_config(file):
     fd = open(file)
     for line in fd:
-        line = string.strip(line)
+        line = line.strip()
         if len(line) > 0 and line[0] != "#":
-            tok = string.split(line, "=")
-            config[string.strip(tok[0])] = string.strip(tok[1])
+            tok = line.split("=")
+            config[tok[0].strip()] = tok[1].strip()
 
 if len(sys.argv) > 1:
     read_config(sys.argv[1])
- 
+
 def setBit(int_type, offset):
   mask = 1 << offset
   return(int_type | mask)
@@ -89,7 +89,7 @@ while True:
     except urllib2.URLError, e:
         log = log + "Failed to reach server. Reason: " + str(e.reason)
     except:
-        log = log + "Unknown error" 
+        log = log + "Unknown error"
     print(log)
 
     time.sleep(1800)
