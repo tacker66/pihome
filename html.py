@@ -17,7 +17,7 @@
 #
 
 #
-# Simple web interface for pihome data. 
+# Simple web interface for pihome data.
 # A standard lighttpd installation is assumed for this functionality
 # and this script must be run as root.
 #
@@ -31,10 +31,10 @@ config = dict()
 def read_config(file):
     fd = open(file)
     for line in fd:
-        line = string.strip(line)
+        line = line.strip()
         if len(line) > 0 and line[0] != "#":
-            tok = string.split(line, "=")
-            config[string.strip(tok[0])] = string.strip(tok[1])
+            tok = line.split("=")
+            config[tok[0].strip()] = tok[1].strip()
 
 if len(sys.argv) > 1:
     read_config(sys.argv[1])
@@ -65,4 +65,4 @@ while True:
     hd.write('</body></html>\n')
     hd.close()
     time.sleep(30)
-    
+
