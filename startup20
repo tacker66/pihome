@@ -1,0 +1,11 @@
+#
+sudo python3 ./sensortag20_run.py B0:B4:48:BD:A0:80 &
+#
+sudo python3 ./sensortag20_run.py B0:B4:48:BF:D9:00 &
+#
+sudo python3 ./html.py /home/pi/thingspeak20.conf &
+#
+sudo python3 ./thingspeak.py /home/pi/thingspeak20.conf &
+#
+sudo python3 ./piglow.py &
+#

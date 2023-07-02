@@ -1,5 +1,5 @@
 
-Raspberry Pi OS (02.12.2020)
+Raspberry Pi OS (02.07.2023)
 ############################
 
 To install pihome "master":
@@ -7,7 +7,7 @@ To install pihome "master":
 
 Install with "Add / Remove Software"
 ====================================
-bluez, pexpect, lighttpd, croniter
+lighttpd
 
 Install with "pip3 install -U"
 ==============================
