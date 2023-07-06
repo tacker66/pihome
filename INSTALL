@@ -31,9 +31,9 @@ sudo apt-get install python3-smbus libi2c-dev
 From https://github.com/pimoroni/piglow:
 - curl -sS https://get.pimoroni.com/piglow | bash
 From https://github.com/benleb/PyGlow
-- pip install git+https://github.com/benleb/PyGlow.git
+- cd PyGlow && git checkout v0.2
+- sudo python setup.py install
 reboot!
-
 
 Raspbian Wheezy
 ###############
