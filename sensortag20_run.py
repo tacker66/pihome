@@ -42,7 +42,6 @@ try:
 except:
     pass
 
-
 ht = 0
 pt = 0
 hu = 0
@@ -126,8 +125,7 @@ while True:
 
         wait_timer = 0
         duty_timer = 0
-        #wait_cycle = 1800
-        wait_cycle = 300
+        wait_cycle = 1800
         duty_cycle = 30
 
         while True:
