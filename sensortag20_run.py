@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 
 #
-# Copyright 2013 Michael Saunby
-# Copyright 2013-2021 Thomas Ackermann
+# Copyright 2016-2023 Thomas Ackermann
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,29 +17,13 @@
 #
 
 #
-# Read sensors from the TI SensorTag. It's a
-# BLE (Bluetooth low energy) device so by
-# automating gatttool with pexpect we are able to read and write values.
+# SensorTag 2.0 v1.3 uuids and handle ranges
 #
-# Usage: sensortag_test.py BLUETOOTH_ADR
-#
-# To find the address of your SensorTag run 'sudo hcitool lescan'
-# To power up your bluetooth dongle run 'sudo hciconfig hci0 up'
-#
-
-#
-# SensorTag v1.5 handle ranges 
-# (discovered by 'primary' resp. 'characteristic' cmd in gatttool):
-#
-#   Temperature: 0x23 - 0x2d (set 0x29 = 01; read 0x25)
-# Accelerometer: 0x2e - 0x38
-#      Humidity: 0x39 - 0x43 (set 0x3f = 01; read 0x3b)
-#  Magnetometer: 0x44 - 0x4e
-#     Barometer: 0x4f - 0x5d (set 0x55 = 01/02; read 0x51/0x5b)
-#     Gyroscope: 0x5e - 0x68
-#          Keys: 0x69 - 0x6d
-#          Test: 0x6e - 0x74 (POST = 0x70; bits: 0 0 gyro press acc mag hum temp, 
-#                                                0x3f means "OK"
+#      Humidity (0xaa21): 0x2a - 0x31 (set 0x2f = 01; read 0x2c)
+#     Barometer (0xaa41): 0x32 - 0x39 (set 0x37 = 01; read 0x34)
+#           IOs (0xaa65): 0x4f - 0x53 (test mode (to read POST): set 0x53 = 02; read 0x51;
+#                                      bits: 0 flash ios move press light hum temp;
+#                                      0x7f means "OK")
 #
 
 import os
@@ -49,7 +32,7 @@ import time
 import pexpect
 from datetime import datetime
 
-from sensortag_funcs import *
+from sensortag20_funcs import *
 
 adr = sys.argv[1]
 
@@ -58,6 +41,7 @@ try:
     os.mkdir(logdir)
 except:
     pass
+
 
 ht = 0
 pt = 0
@@ -74,7 +58,7 @@ def log_values():
     print(adr, " HMTMP %.1f" % ht)
     print(adr, " BRTMP %.1f" % pt)
     print(adr, " AVTMP %.1f" % ((ht + pt) / 2))
-    print(adr, " HUMID %.0f" % hu)
+    print(adr, " HUMID %.1f" % hu)
     print(adr, " BAROM %.0f" % pr)
     print(adr, " EXCPT %d" % exc)
     print(adr, " ACTEX %d" % act)
@@ -84,7 +68,7 @@ def log_values():
     data.write("HMTMP %.1f\n" % ht)
     data.write("BRTMP %.1f\n" % pt)
     data.write("AVTMP %.1f\n" % ((ht + pt) / 2))
-    data.write("HUMID %.0f\n" % hu)
+    data.write("HUMID %.1f\n" % hu)
     data.write("BAROM %.0f\n" % pr)
     data.write("EXCPT %d\n" % exc)
     data.write("ACTEX %d\n" % act)
@@ -93,27 +77,18 @@ def log_values():
 
 def enable_sensors():
     # enable humidity sensor
-    tool.sendline('char-write-req 0x3f 01')
+    tool.sendline('char-write-req 0x2f 01')
     tool.expect('\[LE\]>')
     # enable barometric pressure sensor
-    tool.sendline('char-write-req 0x55 02')
-    tool.expect('\[LE\]>')
-    tool.sendline('char-read-hnd 0x5b')
-    tool.expect('descriptor: .*? \r')
-    after = tool.after
-    v = after.split()[1:] 
-    vals = [int(float.fromhex(n)) for n in v]
-    global barometer
-    barometer = Barometer( vals )
-    tool.sendline('char-write-req 0x55 01')
+    tool.sendline('char-write-req 0x37 01')
     tool.expect('\[LE\]>')
 
 def disable_sensors():
     # disable humidity sensor
-    tool.sendline('char-write-req 0x3f 00')
+    tool.sendline('char-write-req 0x2f 00')
     tool.expect('\[LE\]>')
     # disable barometric pressure sensor
-    tool.sendline('char-write-req 0x55 00')
+    tool.sendline('char-write-req 0x37 00')
     tool.expect('\[LE\]>')
 
 while True:
@@ -135,7 +110,7 @@ while True:
         # By this the current needed for 'just being connected' in the SensorTag 
         # drops from 0.35mA to 0.01mA.
         cons = pexpect.run('hcitool con', encoding='utf-8')
-        cons = cons.split("\r\n")
+        cons = cons.split('\r\n')
         for con in cons:
             if adr in con:
                 tok = con.split()
@@ -145,10 +120,14 @@ while True:
                 if error != "":
                     print("hcittool error: '" + error + "' (handle: " + handle + ", state: " + state + ")")
 
+        # enable test mode to (read POST)
+        tool.sendline('char-write-req 0x53 02')
+        tool.expect('\[LE\]>')
+
         wait_timer = 0
         duty_timer = 0
-        wait_cycle = 1800
-        #wait_cycle = 300
+        #wait_cycle = 1800
+        wait_cycle = 300
         duty_cycle = 30
 
         while True:
@@ -165,7 +144,7 @@ while True:
 
             print(adr, " Life tick ...")
             # read POST result
-            tool.sendline('char-read-hnd 0x70')
+            tool.sendline('char-read-hnd 0x51')
             tool.expect('descriptor: .*? \r') 
             v = tool.after.split()
             post = v[1]
@@ -173,24 +152,24 @@ while True:
             if duty_timer > 0:
                 print(adr, " Reading sensors ...")
                 # read humidity sensor
-                tool.sendline('char-read-hnd 0x3b')
+                tool.sendline('char-read-hnd 0x2c')
                 tool.expect('descriptor: .*? \r') 
                 v = tool.after.split()
                 rawT = int(float.fromhex(v[2] + v[1]))
                 rawH = int(float.fromhex(v[4] + v[3]))
                 (ht, hu) = calcHum(rawT, rawH)
                 # read barometric pressure sensor
-                tool.sendline('char-read-hnd 0x51')
+                tool.sendline('char-read-hnd 0x34')
                 tool.expect('descriptor: .*? \r') 
                 v = tool.after.split()
-                rawT = int(float.fromhex(v[2] + v[1]))
-                rawP = int(float.fromhex(v[4] + v[3]))
-                (pt, pr) = barometer.calc(rawT, rawP)
+                rawT = int(float.fromhex(v[3] + v[2] + v[1]))
+                rawP = int(float.fromhex(v[6] + v[5] + v[4]))
+                (pt, pr) = calcBar(rawT, rawP)
                 stamp = datetime.now().ctime()
                 act = 0
                 log_values()
 
-            # SensorTag's preferred supervision timeout is 10000ms (see characteristic 0x2A04)
+            # SensorTag's preferred supervision timeout is 10.000 ms (see characteristic 0x2A04)
             time.sleep(10)
 
             elapsed = int(time.time() - start)
@@ -203,9 +182,9 @@ while True:
                     duty_timer = 0
 
     except KeyboardInterrupt:
-        tool.sendline('quit')
-        tool.close()
-        sys.exit()
+      tool.sendline('quit')
+      tool.close()
+      sys.exit()
 
     except:
         if handle != "":

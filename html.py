@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 #
-# Copyright 2014-21 Thomas Ackermann
+# Copyright 2014-23 Thomas Ackermann
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,14 +18,13 @@
 
 #
 # Simple web interface for pihome data.
-# A standard lighttpd installation is assumed for this functionality
-# and this script must be run as root.
+# A standard lighttpd installation is assumed for this functionality.
 #
 
 import glob, string, time, os, sys
 
 path = "/tmp/pihome/*"
-html = "/var/www/index.html"
+html = "/var/www/html/index.html"
 
 config = dict()
 def read_config(file):
@@ -57,9 +56,9 @@ while True:
         hd.write('<table border="1">\n')
         fd = open(file)
         for line in fd:
-            tok = string.strip(line).split()
+            tok = line.strip().split()
             hd.write('<tr><td align="right">' + tok[0] + '</td>\n')
-            hd.write('<td align="left">' + string.join(tok[1:]) + '</td></tr>\n')
+            hd.write('<td align="left">' + " ".join(tok[1:]) + '</td></tr>\n')
         fd.close()
         hd.write('</table>\n')
     hd.write('</body></html>\n')

@@ -1,6 +1,6 @@
 
-Raspberry Pi OS (02.07.2023)
-############################
+Raspberry Pi OS (bullseye)
+##########################
 
 To install pihome "master":
 ---------------------------
@@ -22,6 +22,17 @@ Install Enviro Plus
 git clone https://github.com/pimoroni/enviroplus-python.git enviro
 cd enviro
 sudo ./install.sh
+
+Install PiGlow
+==============
+sudo raspi-config
+- activate I2C interface
+sudo apt-get install python3-smbus libi2c-dev
+From https://github.com/pimoroni/piglow:
+- curl -sS https://get.pimoroni.com/piglow | bash
+From https://github.com/benleb/PyGlow
+- pip install git+https://github.com/benleb/PyGlow.git
+reboot!
 
 
 Raspbian Wheezy

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 #
-# Copyright 2021 Thomas Ackermann
+# Copyright 2023 Thomas Ackermann
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ try:
             if arm <= 3:
                 fd = open(file)
                 for line in fd:
-                    tok = string.strip(line).split()
+                    tok = line.strip().split()
                     if tok[0] == "ACTEX":
                         off = 1 # red led
                         if tok[1] == "0":

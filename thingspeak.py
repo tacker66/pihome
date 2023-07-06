@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 #
-# Copyright 2021 Thomas Ackermann
+# Copyright 2021-2023 Thomas Ackermann
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 #
 
 import glob, string, time, os, sys
-import requests, urllib, urllib2
+import requests
 
 path = "/tmp/pihome/*"
 
@@ -51,7 +51,7 @@ while True:
         device_name = config[device_id]
         fd = open(file)
         for line in fd:
-            tok = string.strip(line).split()
+            tok = line.strip().split()
             symbol = tok[0]
             full_symbol = device_name + "." + symbol
             if full_symbol in config:
@@ -65,7 +65,7 @@ while True:
                     field_name = "field" + config[device_name + "." + symbol]
                     values[field_name] = str(value)
                 else:
-                    tok = string.strip(field_num).split(".")
+                    tok = field_num.strip().split(".")
                     field_num = tok[0]
                     field_bit = tok[1]
                     field_name = "field" + field_num
@@ -75,21 +75,12 @@ while True:
                         values[field_name] = setBit(int(values[field_name]), int(field_bit))
         fd.close()
 
-    postdata = urllib.urlencode(values)
-    req = urllib2.Request(config["URL"], postdata)
-
     log = ""
     try:
-        response = urllib2.urlopen(req, None, 5)
-        html_string = response.read()
-        response.close()
-        log = log + "Response: " + html_string
-    except urllib2.HTTPError, e:
-        log = log + "Server could not fulfill the request. Error code: " + str(e.code)
-    except urllib2.URLError, e:
-        log = log + "Failed to reach server. Reason: " + str(e.reason)
+        response = requests.get(config["URL"], params=values)
+        log = log + "Response: " + response.text
     except:
-        log = log + "Unknown error"
+        log = log + "Error"
     print(log)
 
     time.sleep(1800)
