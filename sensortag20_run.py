@@ -193,3 +193,5 @@ while True:
         tool.close(force=True)
         exc = exc + 1
         act = 1
+        log_values()
+
