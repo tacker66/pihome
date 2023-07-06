@@ -104,7 +104,6 @@ while True:
 
         print(adr, " Switching to a lower energy connection ...")
 
-        # TODO
         # gatttool not really connects with enough 'low energy' so reconfigure
         # the connection to the values preferred by SensorTag (see characteristic 0x2A04):
         # i.e. min interval to 100ms and max interval to 200ms.
@@ -128,7 +127,7 @@ while True:
         wait_timer = 0
         duty_timer = 0
         #wait_cycle = 1800
-        wait_cycle = 120
+        wait_cycle = 300
         duty_cycle = 30
 
         while True:
@@ -170,9 +169,8 @@ while True:
                 act = 0
                 log_values()
 
-            # TODO
-            # SensorTag's preferred supervision timeout is (0xF401=62465)ms (see characteristic 0x2A04)
-            time.sleep(10) # 10000ms?
+            # SensorTag's preferred supervision timeout is 10.000 ms (see characteristic 0x2A04)
+            time.sleep(10)
 
             elapsed = int(time.time() - start)
             wait_timer = wait_timer - elapsed
