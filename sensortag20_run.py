@@ -24,6 +24,7 @@
 #           IOs (0xaa65): 0x4f - 0x53 (test mode (to read POST): set 0x53 = 02; read 0x51;
 #                                      bits: 0 flash ios move press light hum temp;
 #                                      0x7f means "OK")
+# Battery Level (0x2A19): 0x1e (read)
 #
 
 import os
@@ -48,11 +49,13 @@ hu = 0
 pr = 0
 exc = 0
 act = 0
+bat = 0
 post = ""
 stamp = ""
 handle = ""
 
 def log_values():
+    print(adr, "   BAT %d" % bat)
     print(adr, "  POST 0x%s" % post)
     print(adr, " HMTMP %.1f" % ht)
     print(adr, " BRTMP %.1f" % pt)
@@ -63,6 +66,7 @@ def log_values():
     print(adr, " ACTEX %d" % act)
     print(adr, " STAMP '%s'" % stamp)
     data = open(logdir+"/"+adr, "w")
+    data.write("  BAT %d\n" % bat)
     data.write(" POST 0x%s\n" % post)
     data.write("HMTMP %.1f\n" % ht)
     data.write("BRTMP %.1f\n" % pt)
@@ -123,6 +127,12 @@ while True:
         tool.sendline('char-write-req 0x53 02')
         tool.expect('\[LE\]>')
 
+        # read POST result
+        tool.sendline('char-read-hnd 0x51')
+        tool.expect('descriptor: .*? \r') 
+        v = tool.after.split()
+        post = v[1]
+
         wait_timer = 0
         duty_timer = 0
         wait_cycle = 1800
@@ -141,11 +151,11 @@ while True:
                 time.sleep(1)
 
             print(adr, " Life tick ...")
-            # read POST result
-            tool.sendline('char-read-hnd 0x51')
+            # read Battery Level result
+            tool.sendline('char-read-hnd 0x1e')
             tool.expect('descriptor: .*? \r') 
             v = tool.after.split()
-            post = v[1]
+            bat = int("0x" + v[1], 0)
 
             if duty_timer > 0:
                 print(adr, " Reading sensors ...")
@@ -191,5 +201,6 @@ while True:
         tool.close(force=True)
         exc = exc + 1
         act = 1
+        bat = 0
         log_values()
 
