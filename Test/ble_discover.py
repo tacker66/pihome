@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 #
-# Copyright 2014-2021 Thomas Ackermann
+# Copyright 2014-2023 Thomas Ackermann
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,6 +26,20 @@ import re
 import sys
 import time
 import pexpect
+
+def read_number(handle):
+  tool.sendline("char-read-hnd " + handle)
+  tool.expect("descriptor:.*\r\n")
+  chars = tool.after.split()[1:]
+  l = len(chars)
+  n = 0
+  m = 1
+  if l > 0:
+    for char in reversed(chars):
+      idx = int(char, 16)
+      n = n + m * idx
+      m = m * 256
+  return n
 
 def read_string(handle):
   tool.sendline("char-read-hnd " + handle)
@@ -130,6 +144,9 @@ for line in lines:
     elif "2a04-" in uuid:
       sys.stdout.write(handle + " :  preferred connection : ")
       sys.stdout.write(read_conprop(handle) + "\n")
+    elif "2a19-" in uuid:
+      sys.stdout.write(handle + " :         battery level : ")
+      sys.stdout.write(str(read_number(handle)) + "\n")
     elif "2a24-" in uuid:
       sys.stdout.write(handle + " :          model number : ")
       sys.stdout.write(read_string(handle) + "\n")
