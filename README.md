@@ -11,3 +11,4 @@ and './Launchpad' might help as a starting point for your own experiments.
 (See esp. ./Test/ble_discover.py which provides a complete
 characteristic discovery of a BLE device.)
 
+See './MicroPython' for a next-gen MicroPython-based solution which is intended to use only BLE Beacon based sensors (i.e. which radiate all important data directly in their Advertsising data).
