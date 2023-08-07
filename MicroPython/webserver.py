@@ -1,8 +1,6 @@
 
 # https://github.com/tacker66/picoweb/tree/micropython
 
-# mip.install("pkg_resources")
-
 from machine import Pin
 import micropython
 import utime
@@ -44,7 +42,6 @@ def wlan_connect(ssid, pwd):
             print('connecting to', ssid)
             sta_if.connect(ssid, pwd)
             while not sta_if.isconnected():
-                toggle_led()
                 print(wlan_status())
                 utime.sleep_ms(1000)
     except:
@@ -62,7 +59,7 @@ index_html = """
 </html>
 """
 
-def update_index(config, values):
+def update(config, values):
     global index_html
     s = """<html>
                 <head>

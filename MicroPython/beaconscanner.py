@@ -3,9 +3,22 @@ import uasyncio as asyncio
 import bluetooth
 import aioble
 import binascii
+
 import thermobeacon
 import Pico_LCD_114_V2
 import webserver
+import thingspeak
+
+SCANTIME = 5_000
+WAITTIME = 15_000
+UPDTIME  = 60_000
+#WAITTIME = 180_000
+#UPDTIME  = 600_000
+
+# try to find mem leaks ...
+import gc
+import machine
+import micropython
 
 config = dict()
 def read_config(file):
@@ -17,11 +30,7 @@ def read_config(file):
             config[tok[0].strip()] = tok[1].strip()
 read_config('beacons.conf')
 
-write_lock = asyncio.Lock()
-
-SCANTIME  = 5000
-SLEEPTIME = 5000
-DISPTIME  = 5000
+lock = asyncio.Lock()
 
 devices = dict()
 async def scan_devices():
@@ -62,37 +71,41 @@ async def calc_values():
 
 async def get_values():
     while True:
-        await write_lock.acquire()
+        await lock.acquire()
         await scan_devices()
         await calc_values()
-        write_lock.release()
-        await asyncio.sleep_ms(SLEEPTIME)
+        lock.release()
+        gc.collect()
+        micropython.mem_info()
+        await asyncio.sleep_ms(WAITTIME)
 
 disp = Pico_LCD_114_V2.LCD_114()
-async def display_values():
+async def show_values():
     while True:
-        while write_lock.locked():
-            await asyncio.sleep(1)
+        await lock.acquire()
         for device in values:
             name = config[device]
-            print(device, name, values[device])
             pos = int(config[name+".POS"])
             act = int(values[device]["ACT"])
             msg = "{:.1f} {:.1f} {:.1f} ({:d})".format(values[device]["TMP"], values[device]["HUM"], values[device]["BAT"], values[device]["ERR"])
             disp.display(pos, name, msg, False, act)
-        await asyncio.sleep_ms(DISPTIME)
-        webserver.update_index(config, values)
-        await asyncio.sleep_ms(DISPTIME)
+            print(device, name, values[device])
+        webserver.update(config, values)
+        thingspeak.update(config, values)
+        lock.release()
+        await asyncio.sleep_ms(UPDTIME)
+        # dirty hack to avoid memory leaks ...
+        machine.soft_reset()
 
 async def start_webserver():
-    webserver.wlan_connect(config["SSID"], config["PASS"])
     webserver.start_webserver("BeaconScanner")
     
 async def main():
+    webserver.wlan_connect(config["SSID"], config["PASS"])
     await asyncio.gather(
+        start_webserver(),
         get_values(),
-        display_values(),
-        start_webserver()
+        show_values(),
         )
 
 asyncio.run(main())
