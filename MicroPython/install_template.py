@@ -14,4 +14,5 @@ while not wlan.isconnected():
     
 print("Connected")
 
-# mip.install("pkg_resources")
+mip.install("pkg_resources")
+mip.install("requests")

@@ -51,10 +51,10 @@ def wlan_connect(ssid, pwd):
 index_html = """
 <html>
   <head>
-    <title>Hello</title>
+    <title>BeaconScanner</title>
   </head>
   <body>
-    <h1>Hello</h1>
+    <h1>BeaconScanner</h1>
   </body>
 </html>
 """

@@ -11,14 +11,14 @@ import thingspeak
 
 SCANTIME = 5_000
 WAITTIME = 15_000
-UPDTIME  = 60_000
-#WAITTIME = 180_000
-#UPDTIME  = 600_000
+UPDTIME  = 120_000
+#SCANTIME = 10_000
+#WAITTIME = 300_000
+#UPDTIME  = 1800_000
+SNDTIME  = 2_000
 
-# try to find mem leaks ...
+# to find memory leaks ...
 import gc
-import machine
-import micropython
 
 config = dict()
 def read_config(file):
@@ -44,25 +44,29 @@ async def scan_devices():
                 devices[device] = device_data
             else:
                 device_data = devices[device]
-            device_data["name"] = result.name()
-            device_data["rssi"] = result.rssi
+            device_data["name"]        = result.name()
+            device_data["rssi"]        = result.rssi
             device_data["connectable"] = result.connectable
+            device_data["manufacturer"].clear() # clear values from last scan; otherwise the set would grow indefinitely
             for data in result.manufacturer():
                 device_data["manufacturer_id"] = data[0]
                 device_data["manufacturer"].add(data[1])
-        
+            
 values = dict()
 async def calc_values():
     for device in devices:
         #print(devices[device]["name"], devices[device]["rssi"], devices[device]["connectable"], device)
         mid = devices[device]["manufacturer_id"]
-        for data in sorted(devices[device]["manufacturer"]):
+        for data in devices[device]["manufacturer"]:
             #print(mid, str(binascii.hexlify(data, ' '), "utf-8"))
             if device in config:
                 if device not in values:
                     values[device] = dict()
                     values[device]["ERR"] = 0
                     values[device]["ACT"] = 0
+                    values[device]["TMP"] = 0
+                    values[device]["HUM"] = 0
+                    values[device]["BAT"] = 0
                 if thermobeacon.can_decode(mid, data):
                     tmp, hum, bat = thermobeacon.decode(mid, data)
                     values[device]["TMP"] = tmp
@@ -76,7 +80,7 @@ async def get_values():
         await calc_values()
         lock.release()
         gc.collect()
-        micropython.mem_info()
+        print("GET", gc.mem_free())
         await asyncio.sleep_ms(WAITTIME)
 
 disp = Pico_LCD_114_V2.LCD_114()
@@ -93,10 +97,17 @@ async def show_values():
         webserver.update(config, values)
         thingspeak.update(config, values)
         lock.release()
+        gc.collect()
+        print("SHOW", gc.mem_free())
         await asyncio.sleep_ms(UPDTIME)
-        # dirty hack to avoid memory leaks ...
-        machine.soft_reset()
 
+async def send_values():
+    while True:
+        thingspeak.send()
+        gc.collect()
+        #print("SEND", gc.mem_free())
+        await asyncio.sleep_ms(SNDTIME)
+        
 async def start_webserver():
     webserver.start_webserver("BeaconScanner")
     
@@ -106,6 +117,7 @@ async def main():
         start_webserver(),
         get_values(),
         show_values(),
+        send_values(),
         )
 
 asyncio.run(main())

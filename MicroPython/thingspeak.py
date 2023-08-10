@@ -1,11 +1,19 @@
 
 # https://thingspeak.com/
 
-import urequests
+import time
+import requests
+
+import gc
+
+WAITTIME = 10 # thingspeak only allows ~8.200 messages per day; messages cannot be sent faster than every 10 seconds
+
+telegram_list = list()
 
 def update(config, values):
-    send_values = dict()
+    global telegram_list
     for device in values:
+        send_values = dict()
         name  = config[device]
         symbs = config["SYMB"].split()
         key   = config[config[name + ".KEY"]]
@@ -14,14 +22,27 @@ def update(config, values):
             value = values[device][symb]
             field_name = "field" + config[name + "." + symb]
             send_values[field_name] = str(value)
-    url = config["URL"] +  "?"
-    for send_value in send_values:
-        url = url + send_value + "=" + send_values[send_value] + ";"
-    print(url)
-    log = ""
-    try:
-        r = urequests.post(url)
+        url = config["URL"] +  "?"
+        for send_value in send_values:
+            url = url + send_value + "=" + send_values[send_value] + ";"
+        telegram_list.append(url)
+        
+last_time = 0
+
+def send():
+    global last_time, telegram_list
+    cur_time = time.time()
+    if len(telegram_list) > 0 and (cur_time - last_time) > WAITTIME:
+        telegram = telegram_list.pop(0)
+        print(len(telegram_list), "SEND", telegram)
+        r = requests.post(telegram)
         log = str(r.status_code) + " " + r.text
-    except:
-        log = "Error"
-    print(log)
+        '''
+        try:
+            r = requests.post(telegram)
+            log = str(r.status_code) + " " + r.text
+        except:
+            log = "Error"
+        '''
+        print(log)
+        last_time = cur_time
