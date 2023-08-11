@@ -65,6 +65,7 @@ async def calc_values():
         for data in devices[device]["manufacturer"]:
             #print(mid, str(binascii.hexlify(data, ' '), "utf-8"))
             if device in config:
+                name = config[device]
                 if device not in values:
                     values[device] = dict()
                     values[device]["ERR"] = 0
@@ -74,6 +75,12 @@ async def calc_values():
                     values[device]["BAT"] = 0
                 if thermobeacon.can_decode(mid, data):
                     tmp, hum, bat = thermobeacon.decode(mid, data)
+                    off = name + ".TMP_OFF"
+                    if off in config:
+                        tmp = tmp + float(config[off])
+                    off = name + ".HUM_OFF"
+                    if off in config:
+                        hum = hum + float(config[off])
                     values[device]["TMP"] = tmp
                     values[device]["HUM"] = hum
                     values[device]["BAT"] = bat
