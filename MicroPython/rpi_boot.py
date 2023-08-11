@@ -14,7 +14,7 @@ start = ""
 MACHINEFREQ = 125_000_000
 #machine.freq(MACHINEFREQ)
 
-#micropython.opt_level(1)
+#micropython.opt_level(3)
 
 def reset_cause():
     rc = machine.reset_cause()
