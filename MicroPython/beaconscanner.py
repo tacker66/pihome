@@ -45,24 +45,24 @@ async def scan_devices():
             if device not in devices:
                 device_data = dict()
                 device_data["manufacturer_id"] = 0
-                device_data["manufacturer"]    = set()
+                device_data["manufacturer"]    = list()
                 devices[device] = device_data
             else:
                 device_data = devices[device]
             device_data["name"]        = result.name()
             device_data["rssi"]        = result.rssi
             device_data["connectable"] = result.connectable
-            device_data["manufacturer"].clear() # clear values from last scan; otherwise the set would grow indefinitely
             for data in result.manufacturer():
                 device_data["manufacturer_id"] = data[0]
-                device_data["manufacturer"].add(data[1])
+                device_data["manufacturer"].append(data[1])
             
 values = dict()
 async def calc_values():
     for device in devices:
         #print(devices[device]["name"], devices[device]["rssi"], devices[device]["connectable"], device)
         mid = devices[device]["manufacturer_id"]
-        for data in devices[device]["manufacturer"]:
+        while len(devices[device]["manufacturer"]):
+            data = devices[device]["manufacturer"].pop(0)
             #print(mid, str(binascii.hexlify(data, ' '), "utf-8"))
             if device in config:
                 name = config[device]
