@@ -8,10 +8,14 @@ import gc
 
 WAITTIME = 20 # thingspeak only allows ~8.200 messages per day; messages cannot be sent faster than every 10.6 seconds
 
+url = ""
 telegram_list = list()
+last_time = 0
 
 def update(config, values):
-    global telegram_list
+    global telegram_list, url
+    if url == "":
+        url = config["URL"] +  "?"
     for device in values:
         send_values = dict()
         name  = config[device]
@@ -22,23 +26,21 @@ def update(config, values):
             value = values[device][symb]
             field_name = "field" + config[name + "." + symb]
             send_values[field_name] = str(value)
-        url = config["URL"] +  "?"
+        telegram = ""
         for send_value in send_values:
-            url = url + send_value + "=" + send_values[send_value] + ";"
-        telegram_list.append(url)
+            telegram = telegram + send_value + "=" + send_values[send_value] + ";"
+        telegram_list.append(telegram)
         
-last_time = 0
-
 def send():
-    global last_time, telegram_list
+    global last_time, telegram_list, url
     cur_time = time.time()
     if len(telegram_list) > 0 and (cur_time - last_time) > WAITTIME:
-        telegram = telegram_list.pop(0)
+        telegram = url + telegram_list.pop(0)
         print(len(telegram_list), "SEND", telegram)
         try:
             r = requests.post(telegram)
             log = str(r.status_code) + " " + r.text
         except:
-            log = "Error"
+            log = "Exception"
         print(log)
         last_time = cur_time
