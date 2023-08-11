@@ -1,2 +1,5 @@
+
 *.pyc
 
+MicroPython/beacons.conf
+MicroPython/install.py
