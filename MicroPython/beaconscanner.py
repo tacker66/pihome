@@ -9,16 +9,21 @@ import Pico_LCD_114_V2
 import webserver
 import thingspeak
 
-SCANTIME = 5_000
-WAITTIME = 15_000
-UPDTIME  = 120_000
-#SCANTIME = 10_000
-#WAITTIME = 300_000
-#UPDTIME  = 1800_000
+test = 1
+
+if test:
+    SCANTIME = 5_000
+    WAITTIME = 15_000
+    UPDTIME  = 120_000
+else:
+    SCANTIME = 10_000
+    WAITTIME = 300_000
+    UPDTIME  = 1800_000
 SNDTIME  = 2_000
 
-# to find memory leaks ...
+# start with clean memory
 import gc
+gc.collect()
 
 config = dict()
 def read_config(file):
