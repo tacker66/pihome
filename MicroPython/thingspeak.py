@@ -6,7 +6,7 @@ import requests
 
 import gc
 
-WAITTIME = 10 # thingspeak only allows ~8.200 messages per day; messages cannot be sent faster than every 10 seconds
+WAITTIME = 15 # thingspeak only allows ~8.200 messages per day; messages cannot be sent faster than every 10.6 seconds
 
 telegram_list = list()
 
@@ -35,14 +35,10 @@ def send():
     if len(telegram_list) > 0 and (cur_time - last_time) > WAITTIME:
         telegram = telegram_list.pop(0)
         print(len(telegram_list), "SEND", telegram)
-        r = requests.post(telegram)
-        log = str(r.status_code) + " " + r.text
-        '''
         try:
             r = requests.post(telegram)
             log = str(r.status_code) + " " + r.text
         except:
             log = "Error"
-        '''
         print(log)
         last_time = cur_time
