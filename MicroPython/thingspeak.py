@@ -6,7 +6,7 @@ import requests
 
 import gc
 
-WAITTIME = 15 # thingspeak only allows ~8.200 messages per day; messages cannot be sent faster than every 10.6 seconds
+WAITTIME = 20 # thingspeak only allows ~8.200 messages per day; messages cannot be sent faster than every 10.6 seconds
 
 telegram_list = list()
 
