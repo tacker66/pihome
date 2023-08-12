@@ -1,8 +1,8 @@
 
-import uasyncio as asyncio
+import gc
+import asyncio
 import bluetooth
 import aioble
-import binascii
 
 import thermobeacon
 import Pico_LCD_114_V2
@@ -20,10 +20,6 @@ else:
     WAITTIME = 300_000
     UPDTIME  = 1800_000
 SNDTIME  = 2_000
-
-# start with clean memory
-import gc
-gc.collect()
 
 config = dict()
 def read_config(file):
@@ -59,11 +55,9 @@ async def scan_devices():
 values = dict()
 async def calc_values():
     for device in devices:
-        #print(devices[device]["name"], devices[device]["rssi"], devices[device]["connectable"], device)
         mid = devices[device]["manufacturer_id"]
         while len(devices[device]["manufacturer"]):
             data = devices[device]["manufacturer"].pop(0)
-            #print(mid, str(binascii.hexlify(data, ' '), "utf-8"))
             if device in config:
                 name = config[device]
                 if device not in values:
@@ -92,7 +86,8 @@ async def get_values():
         await calc_values()
         lock.release()
         gc.collect()
-        print("GET", gc.mem_free())
+        if test:
+            print("get_values", gc.mem_free())
         await asyncio.sleep_ms(WAITTIME)
 
 disp = Pico_LCD_114_V2.LCD_114()
@@ -105,26 +100,33 @@ async def show_values():
             act = int(values[device]["ACT"])
             msg = "{:.1f} {:.1f} {:.1f} ({:d})".format(values[device]["TMP"], values[device]["HUM"], values[device]["BAT"], values[device]["ERR"])
             disp.display(pos, name, msg, False, act)
-            print(device, name, values[device])
+            if test:
+                print(device, name, values[device])
         webserver.update(config, values)
         thingspeak.update(config, values)
         lock.release()
         gc.collect()
-        print("SHOW", gc.mem_free())
+        if test:
+            print("show_values", gc.mem_free())
         await asyncio.sleep_ms(UPDTIME)
 
 async def send_values():
     while True:
         thingspeak.send()
         gc.collect()
-        #print("SEND", gc.mem_free())
         await asyncio.sleep_ms(SNDTIME)
         
 async def start_webserver():
     webserver.start_webserver("BeaconScanner")
+    gc.collect()
+    if test:
+        print("start_webserver", gc.mem_free())
     
 async def main():
     webserver.wlan_connect(config["SSID"], config["PASS"])
+    gc.collect()
+    if test:
+        print("main", gc.mem_free())
     await asyncio.gather(
         start_webserver(),
         get_values(),
