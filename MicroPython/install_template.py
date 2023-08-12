@@ -17,6 +17,4 @@ print("Connected")
 
 import mip
 mip.install("github:tacker66/picoweb")
-mip.install("pkg_resources")
 mip.install("requests")
-mip.install("logging")
