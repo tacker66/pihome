@@ -63,4 +63,4 @@ ROUTES  = [("/", indexhtml), ]
 
 def start_webserver(name):
     app = picoweb.WebApp(name, ROUTES)
-    app.run(debug=0, port=80, host="0.0.0.0")
+    app.run()
