@@ -1,5 +1,5 @@
 
-# https://github.com/tacker66/picoweb/tree/micropython
+# https://github.com/tacker66/picoweb
 
 import utime
 import network
@@ -42,18 +42,27 @@ def wlan_connect(ssid, pwd):
         pass
     print(wlan_status(), sta_if.ifconfig())
 
-index_html = '<html><head><title>Hello</title></head><body><h1>Hello</h1></body></html>'
+from micropython import const
+html_head  = const('<html><head><title>pihome</title><meta http-equiv="refresh" content="30"><head><body><h2>pihome</h2>')
+html_tail  = const('</body></html>\n')
+index_html = html_head + html_tail
 
 def update(config, values):
     global index_html
-    s = '<html><head><title>pihome</title><meta http-equiv="refresh" content="30"><head><body><h2>pihome</h2>'                       
+    devices = dict()
     for device in values:
+        s = ""                       
         name = config[device]
-        s = s + '\n<h3>' + device + ' (' + name + ')' + '</h3>' + '<table border="1">\n'
+        s = s + '\n<h3>' + name + ' (' + device + ')' + '</h3><table border="1">\n'
         for value in sorted(values[device]):
-            s = s + '<tr><td align="right">' + str(value) + '</td>\n' + '<td align="left">' + str(values[device][value]) + '</td></tr>\n'
+            s = s + '<tr><td align="right">' + str(value) + '</td>\n<td align="left">' + str(values[device][value]) + '</td></tr>\n'
         s = s + '</table>\n'
-    s = s + '</body></html>\n'
+        pos = config[name+".POS"]
+        devices[pos] = s
+    s = html_head
+    for pos in sorted(devices):
+        s = s + devices[pos]
+    s = s + html_tail
     index_html = s
     
 def indexhtml(req, resp):
