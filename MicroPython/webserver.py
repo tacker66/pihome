@@ -1,46 +1,7 @@
 
 # https://github.com/tacker66/picoweb
 
-import utime
-import network
 import picoweb
-
-acp_if = network.WLAN(network.AP_IF)
-sta_if = network.WLAN(network.STA_IF)
-
-acp_if.active(False)
-sta_if.active(True)
-
-def _wlan_status(status):
-    if status == network.STAT_IDLE:
-        return 'IDLE'
-    elif status == network.STAT_CONNECTING:
-        return 'CONNECTING'
-    elif status == network.STAT_NO_AP_FOUND:
-        return 'NO_AP_FOUND'
-    elif status == network.STAT_GOT_IP:
-        return 'STAT_GOT_IP'
-    else:
-        return "UNKNOWN: {}".format(status) 
-
-def wlan_status():
-    return _wlan_status(sta_if.status())
-
-def wlan_connect(ssid, pwd):
-    try:
-        if sta_if.isconnected():
-            sta_if.disconnect()
-            while sta_if.isconnected():
-                print(wlan_status())
-                utime.sleep_ms(1000)
-        if not sta_if.isconnected():
-            sta_if.connect(ssid, pwd)
-            while not sta_if.isconnected():
-                print(wlan_status())
-                utime.sleep_ms(1000)
-    except:
-        pass
-    print(wlan_status(), sta_if.ifconfig())
 
 from micropython import const
 html_head  = const('<html><head><title>pihome</title><meta http-equiv="refresh" content="30"><head><body><h2>pihome</h2>')

@@ -1,15 +1,18 @@
 
+test = 1
+use_webserver = 1
+
 import gc
 import asyncio
 import bluetooth
 import aioble
 
+import wifi
 import thermobeacon
 import Pico_LCD_114_V2
-import webserver
+if use_webserver:
+    import webserver
 import thingspeak
-
-test = 1
 
 if test:
     SCANTIME = 5_000
@@ -102,7 +105,8 @@ async def show_values():
             disp.display(pos, name, msg, False, act)
             if test:
                 print(device, name, values[device])
-        webserver.update(config, values)
+        if use_webserver:
+            webserver.update(config, values)
         thingspeak.update(config, values)
         lock.release()
         gc.collect()
@@ -123,15 +127,22 @@ async def start_webserver():
         print("start_webserver", gc.mem_free())
     
 async def main():
-    webserver.wlan_connect(config["SSID"], config["PASS"])
+    wifi.connect(config["SSID"], config["PASS"])
     gc.collect()
     if test:
         print("main", gc.mem_free())
-    await asyncio.gather(
-        start_webserver(),
-        get_values(),
-        show_values(),
-        send_values(),
-        )
-
+    if use_webserver:
+        await asyncio.gather(
+            start_webserver(),
+            get_values(),
+            show_values(),
+            send_values(),
+            )
+    else:
+        await asyncio.gather(
+            get_values(),
+            show_values(),
+            send_values(),
+            )
+        
 asyncio.run(main())
