@@ -1,4 +1,13 @@
 
+#
+# Installation:
+# - rename beacons_template.conf to beacons.conf and add your private data
+# - rename install_template.conf to install.conf and add your private data
+# - run install.py
+# - set 'test = 0' in main.py, beaconscanner.py and thingspeak.py
+# - set 'use_webserver = 1' in beaconscanner.py if you have enough heap memory ;-)
+#
+
 import time
 import network
 
