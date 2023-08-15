@@ -1,6 +1,8 @@
 
 # https://thingspeak.com/
 
+test = 1
+
 import time
 import requests
 
@@ -36,12 +38,12 @@ def send():
     cur_time = time.time()
     if len(telegram_list) > 0 and (cur_time - last_time) > WAITTIME:
         telegram = url + telegram_list.pop(0)
-        try:
+        if test:
             r = requests.post(telegram)
-            log = str(r.status_code) + " " + r.text
-        except:
-            log = "Err"
-        if log == "Err" or r.text == "0": # lazy evaluation ?
-            print(len(telegram_list), "send", telegram)
-            print(log)
+            print(str(len(telegram_list)) + " " + str(r.status_code) + " " + r.text)
+        else:
+            try:
+                requests.post(telegram)
+            except:
+                pass
         last_time = cur_time
