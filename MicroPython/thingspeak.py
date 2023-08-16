@@ -39,11 +39,14 @@ def send():
     if len(telegram_list) > 0 and (cur_time - last_time) > WAITTIME:
         telegram = url + telegram_list.pop(0)
         if test:
-            r = requests.post(telegram)
-            print(str(len(telegram_list)) + " " + str(r.status_code) + " " + r.text)
+            try:
+                r = requests.post(telegram)
+                print(str(len(telegram_list)) + " " + str(r.status_code) + " " + r.text)
+            except:
+                print("Error")
         else:
             try:
                 requests.post(telegram)
             except:
-                pass
+                print("Error")
         last_time = cur_time
