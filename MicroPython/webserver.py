@@ -4,9 +4,9 @@
 import picoweb
 
 from micropython import const
-html_head  = const('<html><head><title>pihome</title><meta http-equiv="refresh" content="30"><head><body><h2>pihome</h2>')
-html_tail  = const('</body></html>\n')
-index_html = html_head + html_tail
+_html_head  = const('<html><head><title>pihome</title><meta http-equiv="refresh" content="30"><head><body><h2>pihome</h2>')
+_html_tail  = const('</body></html>\n')
+index_html = _html_head + _html_tail
 
 def update(config, values):
     global index_html
@@ -20,10 +20,10 @@ def update(config, values):
         s = s + '</table>\n'
         pos = config[name+".POS"]
         devices[pos] = s
-    s = html_head
+    s = _html_head
     for pos in sorted(devices):
         s = s + devices[pos]
-    s = s + html_tail
+    s = s + _html_tail
     index_html = s
     
 def indexhtml(req, resp):
