@@ -1,8 +1,12 @@
 
 #
-# slightly enhanced python driver from
-# https://www.waveshare.com/wiki/Pico-LCD-1.14
-# runs with standard MicroPython 1.19 or later
+#  based on https://www.waveshare.com/wiki/Pico-LCD-1.14
+#
+#  - runs with standard MicroPython 1.19 or later
+#  - can be configured to use only part of the physical display to
+#    save FrameBuffer memory if needed; the remaining vertical resp.
+#    horizontal borders can be colored individually
+#  - additional color definitions
 #
 
 from machine import Pin, SPI, PWM
@@ -17,10 +21,33 @@ class LCD_114(framebuf.FrameBuffer):
     MOSI= 11
     SCK = 10
     CS  = 9
-
-    def __init__(self):
-        self.width  = 240
-        self.height = 135
+    
+    WIDTH  = 240
+    HEIGHT = 135
+    
+    def set_border_color(self, border, color):
+        color = int(color)
+        for ptr in range(0, len(border), 2):
+            border[ptr]   = color % 256
+            border[ptr+1] = color // 256
+    
+    def set_vborder_color(self, color):
+        self.set_border_color(self.v_border, color)
+    
+    def set_hborder_color(self, color):
+        self.set_border_color(self.h_border, color)
+    
+    def __init__(self, width=WIDTH, height=HEIGHT, vborder_color=0x0000, hborder_color=0x0000):
+        if width < 0:
+            width = 0
+        if width > LCD_114.WIDTH:
+            width = LCD_114.WIDTH
+        if height < 0:
+            height = 0
+        if height > LCD_114.HEIGHT:
+            height = LCD_114.HEIGHT
+        self.width  = width
+        self.height = height
         self.spi = SPI(1, 10_000_000, sck=Pin(LCD_114.SCK), mosi=Pin(LCD_114.MOSI))
         self.pwm = PWM(Pin(LCD_114.BL))
         self.pwm.freq(100)
@@ -39,6 +66,16 @@ class LCD_114(framebuf.FrameBuffer):
         self.key6 = Pin(20, Pin.IN, Pin.PULL_UP)
         self.buffer = bytearray(self.height * self.width * 2)
         super().__init__(self.buffer, self.width, self.height, framebuf.RGB565)
+        # vertical border
+        v_border_len  = (LCD_114.WIDTH - self.width) * 2
+        self.v_border = bytearray(v_border_len)
+        self.set_vborder_color(vborder_color)
+        # horizontal border
+        self.h_border_len = 0
+        if self.height < LCD_114.HEIGHT:
+            self.h_border_len = LCD_114.WIDTH * 2
+        self.h_border = bytearray(self.h_border_len)
+        self.set_hborder_color(hborder_color)
         # RGB565 colors (see https://rgbcolorpicker.com/565; LSB first!)
         self.white  = 0xffff
         self.black  = 0x0000
@@ -142,7 +179,13 @@ class LCD_114(framebuf.FrameBuffer):
         self.cs(1)
         self.dc(1)
         self.cs(0)
-        self.spi.write(self.buffer)
+        ptr = 0
+        for line in range(0, self.height):
+            self.spi.write(self.buffer[ptr:ptr+2*self.width])
+            ptr = ptr + 2*self.width
+            self.spi.write(self.v_border)
+        for line in range(0, LCD_114.HEIGHT - self.height):
+            self.spi.write(self.h_border)
         self.cs(1)
 
     def display(self, pos, label, msg, warning=False, error=False):
@@ -165,10 +208,14 @@ class LCD_114(framebuf.FrameBuffer):
         
 if __name__=='__main__':
 
-    LCD = LCD_114()
+    LCD = LCD_114(width=230, height=125, vborder_color=0xe007, hborder_color=0x1f00)
     LCD.fill(LCD.black)
     LCD.show()
-
+    
+    import gc
+    gc.collect()
+    print(gc.mem_free())
+    
     LCD.text("red", 90, 20, LCD.red)
     LCD.text("green", 90, 40, LCD.green)
     LCD.text("yellow", 90, 60, LCD.yellow)
@@ -185,12 +232,16 @@ if __name__=='__main__':
         
         if LCD.keyA.value() == 0:
             LCD.fill_rect(208, 12, 20, 20, LCD.red)
+            LCD.set_vborder_color(LCD.red)
+            LCD.set_hborder_color(LCD.yellow)
         else:
             LCD.fill_rect(208, 12, 20, 20, LCD.white)
             LCD.rect(208, 12, 20, 20, LCD.red)
 
         if LCD.keyB.value() == 0:
             LCD.fill_rect(208, 103, 20, 20, LCD.red)
+            LCD.set_vborder_color(LCD.green)
+            LCD.set_hborder_color(LCD.blue)
         else:
             LCD.fill_rect(208, 103, 20, 20, LCD.white)
             LCD.rect(208, 103, 20, 20, LCD.red)
