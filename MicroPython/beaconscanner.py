@@ -102,7 +102,12 @@ async def show_values():
             name = config[device]
             pos = int(config[name+".POS"])
             act = int(values[device]["ACT"])
-            msg = "{:.1f} {:.1f} {:.1f} ({:d})".format(values[device]["TMP"], values[device]["HUM"], values[device]["BAT"], values[device]["ERR"])
+            tmp = values[device]["TMP"]
+            hum = values[device]["HUM"]
+            bat = values[device]["BAT"]
+            rssi= int((100 + values[device]["RSSI"])/10.0 + 0.5)
+            err = values[device]["ERR"]
+            msg = "{:.1f} {:.1f} {:.1f} {:d} {:d}".format(tmp, hum, bat, rssi, err)
             disp.display(pos, name, msg, False, act)
             if test:
                 print(device, name, values[device])
