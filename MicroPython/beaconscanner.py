@@ -94,7 +94,7 @@ async def get_values():
             print("get_values", gc.mem_free())
         await asyncio.sleep_ms(WAITTIME)
 
-disp = Pico_LCD_114_V2.LCD_114()
+disp = Pico_LCD_114_V2.LCD_114(width=157)
 async def show_values():
     while True:
         await lock.acquire()
