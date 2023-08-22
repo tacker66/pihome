@@ -6,7 +6,8 @@ test = 1
 import time
 import urequests as requests
 
-import gc
+if test:
+    import gc
 
 WAITTIME = 20 # thingspeak only allows ~8.200 messages per day; messages cannot be sent faster than every 10.6 seconds
 
@@ -40,13 +41,18 @@ def send():
         telegram = url + telegram_list.pop(0)
         if test:
             try:
+                alloc_mem = str(gc.mem_alloc())
+                free_mem  = str(gc.mem_free())
+                telegram = telegram + "field7=" + alloc_mem + ";field8=" + free_mem
                 r = requests.post(telegram)
                 print(str(len(telegram_list)) + " " + str(r.status_code) + " " + r.text)
-            except:
-                print("Error")
+                r.close() # this is important to avoid memory leaks!
+            except Exception as e:
+                print(type(e))
         else:
             try:
-                requests.post(telegram)
+                r = requests.post(telegram)
+                r.close() # this is important to avoid memory leaks!
             except:
-                print("Error")
+                pass
         last_time = cur_time
