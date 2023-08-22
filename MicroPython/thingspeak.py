@@ -18,39 +18,38 @@ telegram_list = list()
 def update(config, values):
     global telegram_list, url
     if url == "":
-        url = config["URL"] + "?"
+        url = "{}?".format(config["URL"])
     for device in values:
         send_values = dict()
         name  = config[device]
         symbs = config["SYMB"].split()
-        key   = config[config[name + ".KEY"]]
+        key   = config[config["{}.KEY".format(name)]]
         send_values["key"] = key
         for symb in symbs:
             value = values[device][symb]
-            field_name = "field" + config[name + "." + symb]
-            send_values[field_name] = str(value)
+            field_name = "field{}".format(config["{}.{}".format(name, symb)])
+            send_values[field_name] = value
         telegram = ""
         for send_value in send_values:
-            telegram = telegram + send_value + "=" + send_values[send_value] + ";"
+            telegram = "{}{}={};".format(telegram, send_value, send_values[send_value])
         telegram_list.append(telegram)
         
 def send():
     global last_time, telegram_list, url
     cur_time = time.time()
     if len(telegram_list) > 0 and (cur_time - last_time) > WAITTIME:
-        telegram = url + telegram_list.pop(0)
         if test:
             try:
-                alloc_mem = str(gc.mem_alloc())
-                free_mem  = str(gc.mem_free())
-                telegram = telegram + "field7=" + alloc_mem + ";field8=" + free_mem
+                telegram = "{}{};field7={:d};field8={:d}".format(url, telegram_list.pop(0), gc.mem_alloc(), gc.mem_free())
+                #print(telegram)
                 r = requests.post(telegram)
-                print(str(len(telegram_list)) + " " + str(r.status_code) + " " + r.text)
+                #print("{:d} {:d} {}".format(len(telegram_list), r.status_code, r.text))
                 r.close() # this is important to avoid memory leaks!
             except Exception as e:
-                print(type(e))
+                print(e)
         else:
             try:
+                telegram = "{}{}".format(url, telegram_list.pop(0))
                 r = requests.post(telegram)
                 r.close() # this is important to avoid memory leaks!
             except:

@@ -73,10 +73,10 @@ async def calc_values():
                 values[device]["RSSI"] = devices[device]["rssi"]
                 if thermobeacon.can_decode(mid, data):
                     tmp, hum, bat = thermobeacon.decode(mid, data)
-                    off = name + ".TMP_OFF"
+                    off = "{}.TMP_OFF".format(name)
                     if off in config:
                         tmp = tmp + float(config[off])
-                    off = name + ".HUM_OFF"
+                    off = "{}.TMP_OFF".format(name)
                     if off in config:
                         hum = hum + float(config[off])
                     values[device]["TMP"] = tmp
