@@ -26,4 +26,3 @@ print("Connected")
 
 import mip
 mip.install("github:tacker66/picoweb")
-mip.install("requests")
