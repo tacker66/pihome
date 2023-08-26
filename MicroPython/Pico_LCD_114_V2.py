@@ -14,16 +14,27 @@ import framebuf
 import time
 
 class LCD_114(framebuf.FrameBuffer):
-
-    BL  = 13
-    DC  = 8
-    RST = 12
-    MOSI= 11
-    SCK = 10
-    CS  = 9
     
+    # Display size
     WIDTH  = 240
     HEIGHT = 135
+    # Keys
+    KEY_A = 15
+    KEY_B = 17
+    KEY_2 = 2
+    KEY_3 = 3
+    KEY_4 = 16
+    KEY_5 = 18
+    KEY_6 = 20
+    # Control lines
+    DC  = 8
+    CS  = 9
+    RST = 12
+    # SPI interface
+    SCK = 10
+    MOSI= 11
+    # PWM line
+    BL  = 13
     
     def __init__(self, width=WIDTH, height=HEIGHT, v_border_color=0x0000, h_border_color=0x0000):
         if width < 0:
@@ -45,13 +56,13 @@ class LCD_114(framebuf.FrameBuffer):
         self.cs(1)
         self.dc  = Pin(LCD_114.DC,  Pin.OUT)
         self.dc(1)
-        self.keyA = Pin(15, Pin.IN, Pin.PULL_UP)
-        self.keyB = Pin(17, Pin.IN, Pin.PULL_UP)
-        self.key2 = Pin(2,  Pin.IN, Pin.PULL_UP)
-        self.key3 = Pin(3,  Pin.IN, Pin.PULL_UP)
-        self.key4 = Pin(16, Pin.IN, Pin.PULL_UP)
-        self.key5 = Pin(18, Pin.IN, Pin.PULL_UP)
-        self.key6 = Pin(20, Pin.IN, Pin.PULL_UP)
+        self.keyA = Pin(LCD_114.KEY_A, Pin.IN, Pin.PULL_UP)
+        self.keyB = Pin(LCD_114.KEY_B, Pin.IN, Pin.PULL_UP)
+        self.key2 = Pin(LCD_114.KEY_2,  Pin.IN, Pin.PULL_UP)
+        self.key3 = Pin(LCD_114.KEY_3,  Pin.IN, Pin.PULL_UP)
+        self.key4 = Pin(LCD_114.KEY_4, Pin.IN, Pin.PULL_UP)
+        self.key5 = Pin(LCD_114.KEY_5, Pin.IN, Pin.PULL_UP)
+        self.key6 = Pin(LCD_114.KEY_6, Pin.IN, Pin.PULL_UP)
         self.buffer = bytearray(self.height * self.width * 2)
         super().__init__(self.buffer, self.width, self.height, framebuf.RGB565)
         # vertical and horizontal borders
