@@ -6,6 +6,7 @@
 #  - can be configured to use only part of the physical display to
 #    save FrameBuffer memory if needed; the remaining vertical resp.
 #    horizontal borders can be colored individually
+#  - backlight intensity can be changed
 #  - additional color definitions
 #
 
@@ -36,6 +37,15 @@ class LCD_114(framebuf.FrameBuffer):
     # PWM line
     BL  = 13
     
+    def set_backlight(self, rate):
+        rate = int(rate)
+        if rate < 0:
+            rate = 0
+        if rate > 100:
+            rate = 100
+        rate = int(rate / 100.0 * 65535.0)
+        self.pwm.duty_u16(rate)
+        
     def __init__(self, width=WIDTH, height=HEIGHT, v_border_color=0x0000, h_border_color=0x0000):
         if width < 0:
             width = 0
@@ -49,8 +59,8 @@ class LCD_114(framebuf.FrameBuffer):
         self.height = height
         self.spi = SPI(1, 10_000_000, sck=Pin(LCD_114.SCK), mosi=Pin(LCD_114.MOSI))
         self.pwm = PWM(Pin(LCD_114.BL))
-        self.pwm.freq(100)
-        self.pwm.duty_u16(32768)
+        self.pwm.freq(256)
+        self.set_backlight(25)
         self.rst = Pin(LCD_114.RST, Pin.OUT)
         self.cs  = Pin(LCD_114.CS,  Pin.OUT)
         self.cs(1)
@@ -233,6 +243,7 @@ if __name__=='__main__':
             LCD.fill_rect(208, 12, 20, 20, LCD.red)
             LCD.v_border_color = LCD.red
             LCD.h_border_color = LCD.yellow
+            LCD.set_backlight(25)
         else:
             LCD.fill_rect(208, 12, 20, 20, LCD.white)
             LCD.rect(208, 12, 20, 20, LCD.red)
@@ -241,6 +252,7 @@ if __name__=='__main__':
             LCD.fill_rect(208, 103, 20, 20, LCD.red)
             LCD.v_border_color = LCD.green
             LCD.h_border_color = LCD.blue
+            LCD.set_backlight(75)
         else:
             LCD.fill_rect(208, 103, 20, 20, LCD.white)
             LCD.rect(208, 103, 20, 20, LCD.red)
