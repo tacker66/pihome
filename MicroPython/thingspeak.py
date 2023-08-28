@@ -41,9 +41,7 @@ def send():
         if test:
             try:
                 telegram = "{}{};field7={:d};field8={:d}".format(url, telegram_list.pop(0), gc.mem_alloc(), gc.mem_free())
-                #print(telegram)
                 r = requests.post(telegram)
-                #print("{:d} {:d} {}".format(len(telegram_list), r.status_code, r.text))
                 r.close() # this is important to avoid memory leaks!
             except Exception as e:
                 print(e)

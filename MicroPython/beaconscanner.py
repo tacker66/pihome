@@ -17,16 +17,16 @@ if use_display:
 if use_webserver:
     import webserver
 
+# update interval for external displays
 if test:
-    SCANTIME = 5_000
-    WAITTIME = 15_000
-    UPDTIME  = 120_000
+    SLOW_UPDTIME  = 120_000
 else:
-    SCANTIME = 10_000
-    WAITTIME = 300_000
-    UPDTIME  = 1800_000
-SNDTIME  = 2_000
-WIFITIME = 30_000
+    SLOW_UPDTIME  = 1800_000
+SENDTIME    = 2_000   # trigger interval for sending telegrams to external displays
+FAST_UPDTIME= 60_000  # update interval for local displays
+WIFITIME    = 30_000  # wifi check interval
+SCANTIME    = 5_000   # duration of BLE scan
+WAITTIME    = 15_000  # time to next BLE scan
 
 config = dict()
 def read_config(file):
@@ -98,25 +98,34 @@ async def get_values():
             print("get_values", gc.mem_free())
         await asyncio.sleep_ms(WAITTIME)
 
-async def show_values():
+async def show_fast_values():
     while True:
         await lock.acquire()
         if use_display:
             display.update(config, values)
         if use_webserver:
             webserver.update(config, values)
+        lock.release()
+        gc.collect()
+        if test:
+            print("show_fast_values", gc.mem_free())
+        await asyncio.sleep_ms(FAST_UPDTIME)
+
+async def show_slow_values():
+    while True:
+        await lock.acquire()
         thingspeak.update(config, values)
         lock.release()
         gc.collect()
         if test:
-            print("show_values", gc.mem_free())
-        await asyncio.sleep_ms(UPDTIME)
+            print("show_slow_values", gc.mem_free())
+        await asyncio.sleep_ms(SLOW_UPDTIME)
 
 async def send_values():
     while True:
         thingspeak.send()
         gc.collect()
-        await asyncio.sleep_ms(SNDTIME)
+        await asyncio.sleep_ms(SENDTIME)
         
 async def start_webserver():
     webserver.start_webserver("BeaconScanner")
@@ -141,7 +150,8 @@ async def main():
         await asyncio.gather(
             start_webserver(),
             get_values(),
-            show_values(),
+            show_fast_values(),
+            show_slow_values(),
             send_values(),
             check_wifi(),
             )
