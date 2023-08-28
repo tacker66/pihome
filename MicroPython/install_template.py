@@ -4,7 +4,7 @@
 # - rename beacons_template.conf to beacons.conf and add your private data
 # - rename install_template.conf to install.conf and add your private data
 # - run install.py
-# - set 'test = 0' in main.py, beaconscanner.py, thingspeak.py, display.py
+# - set 'test = 0' in beaconscanner.py, thingspeak.py, display.py
 # - set 'use_display = 1' in beaconscanner.py if needed
 # - set 'use_webserver = 1' in beaconscanner.py if needed
 #
