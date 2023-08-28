@@ -26,6 +26,7 @@ else:
     WAITTIME = 300_000
     UPDTIME  = 1800_000
 SNDTIME  = 2_000
+WIFITIME = 30_000
 
 config = dict()
 def read_config(file):
@@ -123,6 +124,14 @@ async def start_webserver():
     if test:
         print("start_webserver", gc.mem_free())
     
+async def check_wifi():
+    while True:
+        if not wifi.is_connected():
+            if test:
+                print("check_wifi: reconnect")
+            wifi.connect(config["SSID"], config["PASS"], True)
+        await asyncio.sleep_ms(WIFITIME)
+    
 async def main():
     wifi.connect(config["SSID"], config["PASS"])
     gc.collect()
@@ -134,6 +143,7 @@ async def main():
             get_values(),
             show_values(),
             send_values(),
+            check_wifi(),
             )
     else:
         await asyncio.gather(

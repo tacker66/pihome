@@ -1,12 +1,8 @@
 
-import utime
+import time
 import network
 
-acp_if = network.WLAN(network.AP_IF)
-sta_if = network.WLAN(network.STA_IF)
-
-acp_if.active(False)
-sta_if.active(True)
+nic = network.WLAN(network.STA_IF)
 
 def _status(status):
     if status == network.STAT_IDLE:
@@ -21,20 +17,23 @@ def _status(status):
         return "UNKNOWN: {}".format(status) 
 
 def status():
-    return _status(sta_if.status())
+    return _status(nic.status())
 
-def connect(ssid, pwd):
+def is_connected():
+    return nic.isconnected()
+
+def connect(ssid, pwd, reconnect=False):
     try:
-        if sta_if.isconnected():
-            sta_if.disconnect()
-            while sta_if.isconnected():
+        if reconnect:
+            nic.active(False)
+        if not nic.isconnected():
+            nic.active(True)
+            nic.connect(ssid, pwd)
+            wait = 30
+            while not nic.isconnected() and wait:
                 print(status())
-                utime.sleep_ms(1000)
-        if not sta_if.isconnected():
-            sta_if.connect(ssid, pwd)
-            while not sta_if.isconnected():
-                print(status())
-                utime.sleep_ms(1000)
+                time.sleep(1)
+                wait = wait - 1
     except:
         pass
-    print(status(), sta_if.ifconfig())
+    print(status(), nic.ifconfig())
