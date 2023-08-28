@@ -1,5 +1,6 @@
 
 test = 1
+use_display   = 1
 use_webserver = 1
 
 import gc
@@ -8,11 +9,13 @@ import bluetooth
 import aioble
 
 import wifi
+import thingspeak
 import thermobeacon
-import Pico_LCD_114_V2
+
+if use_display:
+    import display
 if use_webserver:
     import webserver
-import thingspeak
 
 if test:
     SCANTIME = 5_000
@@ -94,23 +97,11 @@ async def get_values():
             print("get_values", gc.mem_free())
         await asyncio.sleep_ms(WAITTIME)
 
-disp = Pico_LCD_114_V2.LCD_114(width=157)
 async def show_values():
     while True:
         await lock.acquire()
-        for device in values:
-            name = config[device]
-            pos = int(config[name+".POS"])
-            act = int(values[device]["ACT"])
-            tmp = values[device]["TMP"]
-            hum = values[device]["HUM"]
-            bat = values[device]["BAT"]
-            rssi= int((100 + values[device]["RSSI"])/10.0 + 0.5)
-            err = values[device]["ERR"]
-            msg = "{:.1f} {:.1f} {:.1f} {:d} {:d}".format(tmp, hum, bat, rssi, err)
-            disp.display(pos, name, msg, False, act)
-            if test:
-                print(device, name, values[device])
+        if use_display:
+            display.update(config, values)
         if use_webserver:
             webserver.update(config, values)
         thingspeak.update(config, values)
