@@ -23,6 +23,14 @@ def _display(pos, label, msg, errorlevel=0):
     _lcd.text(msg, x, y, fg)
     _lcd.show()
 
+def update_border(errorlevel=0):
+    if errorlevel == 0:
+        _lcd.v_border_color = _lcd.black
+    if errorlevel == 1:
+        _lcd.v_border_color = _lcd.yellow
+    if errorlevel > 1:
+        _lcd.v_border_color = _lcd.red
+
 def update(config, values):
     for device in values:
         name = config[device]

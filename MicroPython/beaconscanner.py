@@ -141,9 +141,12 @@ async def start_webserver():
 async def check_wifi():
     while True:
         if not wifi.is_connected():
+            display.update_border(errorlevel=2)
             if test:
                 print("check_wifi: reconnect")
             wifi.connect(config["SSID"], config["PASS"], True)
+        else:
+            display.update_border(errorlevel=0)
         await asyncio.sleep_ms(WIFITIME)
     
 async def main():
