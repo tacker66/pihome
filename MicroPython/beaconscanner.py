@@ -1,5 +1,6 @@
 
 test = 1
+
 use_display   = 1
 use_webserver = 1
 
@@ -42,6 +43,8 @@ lock = asyncio.Lock()
 
 devices = dict()
 async def scan_devices():
+    for device in devices:
+        devices[device]["rssi"] = 0 # check if we have lost some devices
     async with aioble.scan(SCANTIME, interval_us=30000, window_us=30000, active=True) as scanner:
         async for result in scanner:
             device = result.device.addr_hex()
@@ -62,15 +65,15 @@ async def scan_devices():
             
 values = dict()
 async def calc_values():
+    for device in values:
+        values[device]["RSSI"] = devices[device]["rssi"]
     for device in devices:
-        mid = devices[device]["manufacturer_id"]
+        name = config[device]
+        mid  = devices[device]["manufacturer_id"]
         while len(devices[device]["manufacturer"]):
             data = devices[device]["manufacturer"].pop(0)
-            name = config[device]
             if device not in values:
                 values[device] = dict()
-                values[device]["ERR"] = 0
-                values[device]["ACT"] = 0
                 values[device]["TMP"] = 0
                 values[device]["HUM"] = 0
                 values[device]["BAT"] = 0
