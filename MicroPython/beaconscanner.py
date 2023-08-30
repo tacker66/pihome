@@ -66,7 +66,9 @@ async def scan_devices():
 values = dict()
 async def calc_values():
     for device in values:
-        values[device]["RSSI"] = devices[device]["rssi"]
+        values[device]["RSSI"] = devices[device]["rssi"] # local error indicator
+        if values[device]["RSSI"] == 0:
+            values[device]["BAT"] = 0 # external error indicator
     for device in devices:
         name = config[device]
         mid  = devices[device]["manufacturer_id"]
