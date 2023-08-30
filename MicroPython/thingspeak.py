@@ -20,20 +20,17 @@ def update(config, values):
     if url == "":
         url = "{}?".format(config["URL"])
     for device in values:
-        send_values = dict()
         name  = config[device]
         symbs = config["SYMB"].split()
         key   = config[config["{}.KEY".format(name)]]
-        if key not in telegrams:
-            telegrams[key] = ""
         for symb in symbs:
-            value = values[device][symb]
-            field_name = "field{}".format(config["{}.{}".format(name, symb)])
-            send_values[field_name] = value
-        telegram = ""
-        for send_value in send_values:
-            telegram = "{}{}={};".format(telegram, send_value, send_values[send_value])
-        telegrams[key] = "{}{}".format(telegrams[key], telegram)
+            field = "field{}={};".format(config["{}.{}".format(name, symb)], values[device][symb])
+            val_key = "{}.{}.KEY".format(name, symb)
+            if val_key in config:
+                key = config[config[val_key]]
+            if key not in telegrams:
+                telegrams[key] = ""
+            telegrams[key] = "{}{}".format(telegrams[key], field)
         
 def send():
     global last_time, telegrams, url
@@ -42,7 +39,9 @@ def send():
         if len(telegrams[key]) > 0 and (cur_time - last_time) > WAITTIME:
             if test:
                 try:
-                    telegram = "{}{}key={};field7={:d};field8={:d}".format(url, telegrams[key], key, gc.mem_alloc(), gc.mem_free())
+                    telegram = "{}{}key={}".format(url, telegrams[key], key)
+                    if "field8" not in telegram:
+                        telegram = "{};field8={:d}".format(telegram, gc.mem_free())
                     print(telegram)
                     r = requests.post(telegram)
                     r.close() # this is important to avoid memory leaks!
