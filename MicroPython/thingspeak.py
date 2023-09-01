@@ -42,7 +42,6 @@ def send():
                     telegram = "{}{}key={}".format(url, telegrams[key], key)
                     if "field8" not in telegram:
                         telegram = "{};field8={:d}".format(telegram, gc.mem_free())
-                    print(telegram)
                     r = requests.post(telegram)
                     r.close() # this is important to avoid memory leaks!
                 except Exception as e:
@@ -50,7 +49,6 @@ def send():
             else:
                 try:
                     telegram = "{}{}key={}".format(url, telegrams[key], key)
-                    print(telegram)
                     r = requests.post(telegram)
                     r.close() # this is important to avoid memory leaks!
                 except:
