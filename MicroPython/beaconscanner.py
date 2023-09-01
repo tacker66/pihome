@@ -22,12 +22,12 @@ if use_webserver:
 if test:
     SLOW_UPDTIME  = 120_000
 else:
-    SLOW_UPDTIME  = 1800_000
+    SLOW_UPDTIME  = 900_000
 SENDTIME    = 2_000   # trigger interval for sending telegrams to external displays
 FAST_UPDTIME= 60_000  # update interval for local displays
-WIFITIME    = 30_000  # wifi check interval
-SCANTIME    = 5_000   # duration of BLE scan
-WAITTIME    = 15_000  # time to next BLE scan
+WIFITIME    = 20_000  # wifi check interval
+SCANTIME    = 7_000   # duration of BLE scan
+WAITTIME    = 20_000  # time to next BLE scan
 
 config = dict()
 def read_config(file):

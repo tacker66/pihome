@@ -2,6 +2,9 @@
 import time
 import network
 
+WIFICYCLES = 20    # wifi check cycles
+WIFIWAIT   = 1_000 # wifi check interval
+
 nic = network.WLAN(network.STA_IF)
 
 def _status(status):
@@ -29,10 +32,10 @@ def connect(ssid, pwd, reconnect=False):
         if not nic.isconnected():
             nic.active(True)
             nic.connect(ssid, pwd)
-            wait = 30
+            wait = WIFICYCLES
             while not nic.isconnected() and wait:
                 print(status())
-                time.sleep(1)
+                time.sleep_ms(WIFIWAIT)
                 wait = wait - 1
     except:
         pass
