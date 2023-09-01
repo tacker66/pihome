@@ -52,6 +52,9 @@ def update(config, values):
         if rssi != 0:
             rssi= int((100 + rssi)/10.0 + 0.5)
         msg = "{:.1f} {:.1f} {:.1f} {:d}".format(tmp, hum, bat, rssi)
+        dname = name+".NAM"
+        if dname in config:
+            name = config[dname]
         _display(pos, name, msg, 0 if rssi != 0 else 2)
         if test:
             print(device, name, values[device])

@@ -14,11 +14,14 @@ def update(config, values):
     for device in values:
         s = ""                       
         name = config[device]
+        pos  = config[name+".POS"]
+        dname= name+".NAM"
+        if dname in config:
+            name = config[dname]
         s = s + '\n<h3>' + name + ' (' + device + ')' + '</h3><table border="1">\n'
         for value in sorted(values[device]):
             s = s + '<tr><td align="right">' + str(value) + '</td>\n<td align="left">' + str(values[device][value]) + '</td></tr>\n'
         s = s + '</table>\n'
-        pos = config[name+".POS"]
         devices[pos] = s
     s = _html_head
     for pos in sorted(devices):
