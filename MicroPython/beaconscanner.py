@@ -85,7 +85,7 @@ async def calc_values():
                 off = "{}.TMP.OFF".format(name)
                 if off in config:
                     tmp = tmp + float(config[off])
-                off = "{}.TMP.OFF".format(name)
+                off = "{}.HUM.OFF".format(name)
                 if off in config:
                     hum = hum + float(config[off])
                 values[device]["TMP"] = tmp
