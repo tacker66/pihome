@@ -7,6 +7,7 @@
 # - set 'test = 0' in beaconscanner.py, thingspeak.py, display.py
 # - set 'use_display = 1' in beaconscanner.py if needed
 # - set 'use_webserver = 1' in beaconscanner.py if needed
+# - in display.py: adapt _used_pos and _used_len to your needs
 #
 
 import time

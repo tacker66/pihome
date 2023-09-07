@@ -1,10 +1,11 @@
 
 test = 1
 
-from Pico_LCD_114_V2 import LCD_114 as LCD
-
 _used_pos  = 4
 _used_len  = 122
+
+from Pico_LCD_114_V2 import LCD_114 as LCD
+
 _num_pos   = 6
 _start_x   = 0
 _start_y   = 0
