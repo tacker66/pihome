@@ -24,13 +24,15 @@ def update(config, values):
         symbs = config["SYMB"].split()
         key   = config[config["{}.KEY".format(name)]]
         for symb in symbs:
-            field = "field{}={};".format(config["{}.{}".format(name, symb)], values[device][symb])
-            val_key = "{}.{}.KEY".format(name, symb)
-            if val_key in config:
-                key = config[config[val_key]]
-            if key not in telegrams:
-                telegrams[key] = ""
-            telegrams[key] = "{}{}".format(telegrams[key], field)
+            symbol = "{}.{}".format(name, symb)
+            if symbol in config:
+                field = "field{}={};".format(config[symbol], values[device][symb])
+                val_key = "{}.{}.KEY".format(name, symb)
+                if val_key in config:
+                    key = config[config[val_key]]
+                if key not in telegrams:
+                    telegrams[key] = ""
+                telegrams[key] = "{}{}".format(telegrams[key], field)
         
 def send():
     global last_time, telegrams, url
