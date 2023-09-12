@@ -27,7 +27,7 @@ def calcTmp(ambT, objT):
 
 def calcHum(rawT, rawH):
     tmp = (float(rawT) / 65536 ) * 165 - 40
-    hum = (float(rawH) / 65536 ) * 112 # 112 (and not 100) gives the same value as the app
+    hum = (float(rawH) / 65536 ) * 75 # the docs say 100, the app uses 112 but 75 seems to be correct ...
     return (tmp, hum)
 
 def calcBar(rawT, rawP):
