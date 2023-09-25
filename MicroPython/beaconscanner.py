@@ -22,7 +22,7 @@ if use_webserver:
 if test:
     SLOW_UPDTIME  = 120_000
 else:
-    SLOW_UPDTIME  = 900_000
+    SLOW_UPDTIME  = 600_000
 SENDTIME    = 2_000   # trigger interval for sending telegrams to external displays
 FAST_UPDTIME= 60_000  # update interval for local displays
 WIFITIME    = 20_000  # wifi check interval
