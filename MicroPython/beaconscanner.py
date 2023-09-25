@@ -62,7 +62,10 @@ async def scan_devices():
                 for data in result.manufacturer():
                     device_data["manufacturer_id"] = data[0]
                     device_data["manufacturer"].append(data[1])
-            
+            else:
+                if test and str(result.name()) != "None":
+                    print("unknown device", result.name(), device)   
+                    
 values = dict()
 async def calc_values():
     for device in values:

@@ -5,6 +5,8 @@
 # - rename install_template.conf to install.conf and add your private data
 # - run install.py
 # - set 'test = 0' in beaconscanner.py, thingspeak.py, display.py
+# - use 'test = 1' in beaconscanner.py to identify new beacons
+# - use 'test = 1' in display.py to ease finding calibration values
 # - set 'use_display = 1' in beaconscanner.py if needed
 # - set 'use_webserver = 1' in beaconscanner.py if needed
 # - in display.py: adapt _used_pos and _used_len to your needs
