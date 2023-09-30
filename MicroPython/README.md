@@ -1,4 +1,4 @@
 BeaconScanner
 =============
 
-See install_template.py for instructions.
+See install.py for instructions.
