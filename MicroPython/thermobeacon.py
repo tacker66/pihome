@@ -10,7 +10,7 @@ def can_decode(mid, data):
 
 def decode(mid, data):
     if mid == 16 and len(data) == 18:
-        m8, m7, m6, m5, m4, m3, m2, m1, volt, temp_raw, hum_raw = struct.unpack('BBBBBBBBHHH', data)
+        m8, m7, m6, m5, m4, m3, m2, m1, volt, temp_raw, hum_raw = struct.unpack('BBBBBBBBHhH', data)
         temp = temp_raw / 16.0
         hum  = hum_raw / 16.0
         volt = volt / 1000.0
