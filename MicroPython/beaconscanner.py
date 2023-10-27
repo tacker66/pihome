@@ -39,6 +39,9 @@ def read_config(file):
             config[tok[0].strip()] = tok[1].strip()
 read_config('beacons.conf')
 
+if use_display:
+    display.init(config)
+    
 lock = asyncio.Lock()
 
 devices = dict()

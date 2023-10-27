@@ -4,7 +4,7 @@
 # - copy all files in this folder to your device
 # - rename beacons_template.conf to beacons.conf and add your wifi credentials and thingspeak channel keys
 # - run install.py
-# - beaconscanner.py: set 'use_display = 0' if no display is used
+# - beaconscanner.py: set 'display_entries' and 'display_width' in beacons.conf according to your needs or set 'use_display = 0' if no display is used
 # - beaconscanner.py: set 'use_webserver = 0' if no webserver is used
 # - adding a beacon:
 #   - set 'test = 1' in beaconscanner.py and display.py
@@ -14,8 +14,6 @@
 #   - add configuration data for this beacon in beacons.conf
 #   - run beaconscanner.py again; beacon values will be displayed
 #   - if you have several beacons consider chosing suitable calibration values for TMP and HUM to get identical readings 
-# - display.py: set _used_pos to the number of beacons to be displayed
-# - display.py: set _used_len to the number of horizontal pixels to be used for displaying entries
 # - set 'test = 0' in beaconscanner.py, display.py, thingspeak.py
 # - restart your device
 #

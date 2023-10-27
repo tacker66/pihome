@@ -1,19 +1,18 @@
 
 test = 1
 
-_used_pos  = 4
-_used_len  = 122
-
 from Pico_LCD_114_V2 import LCD_114 as LCD
 
 _num_pos   = 6
 _start_x   = 0
 _start_y   = 0
 _height    = 10
-_lcd_width = _used_len+_start_y
-_lcd_height= _used_pos*(_height+1)*2
 
-_lcd = LCD(width=_lcd_width, height=_lcd_height)
+def init(config):
+    global _lcd, _lcd_width, _lcd_height
+    _lcd_height= int(config["display_entries"]) * (_height + 1) * 2
+    _lcd_width = int(config["display_width"]) + _start_y
+    _lcd = LCD(width=_lcd_width, height=_lcd_height)
 
 def _display(pos, label, msg, errorlevel=0):
     pos = (pos % _num_pos) * 2
