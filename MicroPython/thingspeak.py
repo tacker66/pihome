@@ -9,7 +9,9 @@ import urequests as requests
 if test:
     import gc
 
-WAITTIME = 20 # thingspeak only allows ~8.200 messages per day; messages cannot be sent faster than every 10.6 seconds
+WAITTIME = 20   # thingspeak only allows ~8.200 messages per day so
+                # messages cannot be sent faster than every 10.6 seconds;
+                # otherwise r.text == "0" will be returned
 
 url = ""
 last_time = 0
@@ -33,27 +35,20 @@ def update(config, values):
                 if key not in telegrams:
                     telegrams[key] = ""
                 telegrams[key] = "{}{}".format(telegrams[key], field)
-        
+    
 def send():
     global last_time, telegrams, url
     cur_time = time.time()
     for key in telegrams:
         if len(telegrams[key]) > 0 and (cur_time - last_time) > WAITTIME:
-            if test:
-                try:
-                    telegram = "{}{}key={}".format(url, telegrams[key], key)
-                    if "field8" not in telegram:
-                        telegram = "{};field8={:d}".format(telegram, gc.mem_free())
-                    r = requests.post(telegram)
-                    r.close() # this is important to avoid memory leaks!
-                except Exception as e:
+            try:
+                telegram = "{}{}key={}".format(url, telegrams[key], key)
+                if test and "field8" not in telegram:
+                    telegram = "{};field8={:d}".format(telegram, gc.mem_free())
+                r = requests.post(telegram)
+                r.close() # this is important to avoid memory leaks!
+            except Exception as e:
+                if test:
                     print(e)
-            else:
-                try:
-                    telegram = "{}{}key={}".format(url, telegrams[key], key)
-                    r = requests.post(telegram)
-                    r.close() # this is important to avoid memory leaks!
-                except:
-                    pass
             telegrams[key] = ""
             last_time = cur_time
