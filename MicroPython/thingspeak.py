@@ -4,7 +4,7 @@
 test = 1
 
 import time
-import urequests as requests
+import requests
 
 if test:
     import gc
