@@ -46,7 +46,6 @@ def send():
                         telegram = "{};field8={:d}".format(telegram, gc.mem_free())
                     r = requests.post(telegram)
                     r.close() # this is important to avoid memory leaks!
-                    telegrams[key] = ""
                 except Exception as e:
                     print(e)
             else:
@@ -54,7 +53,7 @@ def send():
                     telegram = "{}{}key={}".format(url, telegrams[key], key)
                     r = requests.post(telegram)
                     r.close() # this is important to avoid memory leaks!
-                    telegrams[key] = ""
                 except:
                     pass
+            telegrams[key] = ""
             last_time = cur_time
