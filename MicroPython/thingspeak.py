@@ -35,9 +35,14 @@ def update(config, values):
                 if key not in telegrams:
                     telegrams[key] = ""
                 telegrams[key] = "{}{}".format(telegrams[key], field)
-    
+
+last_ret = "-"
+last_exc = "-"
+def format_status():
+    return "ret:%20" + last_ret + "%20exc:%20" + last_exc
+
 def send():
-    global last_time, telegrams, url
+    global last_time, telegrams, url, last_ret, last_exc
     cur_time = time.time()
     for key in telegrams:
         if len(telegrams[key]) > 0 and (cur_time - last_time) > WAITTIME:
@@ -45,9 +50,14 @@ def send():
                 telegram = "{}{}key={}".format(url, telegrams[key], key)
                 if test and "field8" not in telegram:
                     telegram = "{};field8={:d}".format(telegram, gc.mem_free())
+                    telegram = "{};status={}".format(telegram, format_status())
                 r = requests.post(telegram)
+                last_ret = r.text
+                if last_ret == "0": # too many telegrams
+                    last_exc = last_ret
                 r.close() # this is important to avoid memory leaks!
             except Exception as e:
+                last_exc = str(e)
                 if test:
                     print(e)
             telegrams[key] = ""
