@@ -34,11 +34,12 @@ def update(config, values):
 
 last_ret = "-"
 last_exc = "-"
+cnt_exc  = 0
 def format_status():
-    return "ret:%20" + last_ret + "%20exc:%20" + last_exc
+    return "ret:%20" + last_ret + "%20cnt:%20" + str(cnt_exc) + "%20exc:%20" + last_exc
 
 def send():
-    global last_time, telegrams, url, last_ret, last_exc
+    global last_time, telegrams, url, last_ret, last_exc, cnt_exc
     cur_time = time.time()
     for key in telegrams:
         if len(telegrams[key]) > 0 and (cur_time - last_time) > WAITTIME:
@@ -51,8 +52,10 @@ def send():
                 last_ret = r.text
                 if last_ret == "0": # too many telegrams
                     last_exc = last_ret
+                cnt_exc = 0
                 r.close() # this is important to avoid memory leaks!
             except Exception as e:
                 last_exc = str(e)
+                cnt_exc += 1
             telegrams[key] = ""
             last_time = cur_time
