@@ -14,7 +14,7 @@
 #   - add configuration data for this beacon in beacons.conf
 #   - run beaconscanner.py again; beacon values will be displayed
 #   - if you have several beacons consider chosing suitable calibration values for TMP and HUM to get identical readings 
-# - set 'test = 0' in beaconscanner.py, display.py, thingspeak.py
+# - set 'test = 0' in beaconscanner.py, display.py
 # - restart your device
 #
 

@@ -1,13 +1,9 @@
 
 # https://thingspeak.com/
 
-test = 1
-
+import gc
 import time
 import requests
-
-if test:
-    import gc
 
 WAITTIME = 20   # thingspeak only allows ~8.200 messages per day so
                 # messages cannot be sent faster than every 10.6 seconds;
@@ -48,7 +44,7 @@ def send():
         if len(telegrams[key]) > 0 and (cur_time - last_time) > WAITTIME:
             try:
                 telegram = "{}{}key={}".format(url, telegrams[key], key)
-                if test and "field8" not in telegram:
+                if "field8" not in telegram:
                     telegram = "{};field8={:d}".format(telegram, gc.mem_free())
                     telegram = "{};status={}".format(telegram, format_status())
                 r = requests.post(telegram)
@@ -58,7 +54,5 @@ def send():
                 r.close() # this is important to avoid memory leaks!
             except Exception as e:
                 last_exc = str(e)
-                if test:
-                    print(e)
             telegrams[key] = ""
             last_time = cur_time
