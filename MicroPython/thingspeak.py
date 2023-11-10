@@ -36,7 +36,11 @@ last_ret = "-"
 last_exc = "-"
 cnt_exc  = 0
 def format_status():
-    return "ret:%20" + last_ret + "%20cnt:%20" + str(cnt_exc) + "%20exc:%20" + last_exc
+    msg = "ret: " + last_ret + " cnt: " + str(cnt_exc) + " exc: " + last_exc
+    msg = msg.replace("\n", " ")
+    msg = msg.replace("\t", " ")
+    msg = msg.replace(" ", "%20")
+    return msg
 
 def send():
     global last_time, telegrams, url, last_ret, last_exc, cnt_exc
