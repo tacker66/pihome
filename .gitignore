@@ -1,5 +1,2 @@
 
 *.pyc
-
-MicroPython/beacons-*.conf
-MicroPython/beacons.conf
