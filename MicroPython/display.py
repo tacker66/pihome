@@ -25,6 +25,8 @@ def _display(pos, label, msg, errorlevel=0):
         fg = LCD.YELLOW
     if errorlevel > 1:
         fg = LCD.RED
+    if errorlevel > 2:
+        fg = LCD.WHITE
     _lcd.rect(x, y, _lcd_width, 2*(h+1), bg, True)
     _lcd.text(label, x, y, fg)
     y = y + h
@@ -55,6 +57,11 @@ def update(config, values):
         dname = name+".NAM"
         if dname in config:
             name = config[dname]
-        _display(pos, name, msg, 0 if rssi != 0 else 2)
+        errorlevel = 0
+        if rssi == 0:
+            errorlevel = 2
+        if tmp <= 0.0:
+            errorlevel = 3
+        _display(pos, name, msg, errorlevel)
         if test:
             print(device, name, values[device])
