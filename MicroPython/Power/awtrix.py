@@ -1,4 +1,7 @@
 
+# https://github.com/Blueforcer/awtrix-light
+# https://blueforcer.github.io/awtrix-light/#/api
+
 import gc
 import requests
 
