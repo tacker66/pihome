@@ -23,7 +23,6 @@ def update_setting(setting, value):
     gc.collect()
     data = '{"' + setting + '": "' + str(value) + '"}'
     r = requests.post(_api + 'settings', data=data)
-    print(r.text)
     r.close()
 
 def update_app(name, text, icon=0, color="", save=False):
@@ -38,7 +37,6 @@ def update_app(name, text, icon=0, color="", save=False):
         data = data + ', "save": true'
     data = data + '}'
     r = requests.post(_api + 'custom?name='+name, data=data)
-    print(r.text)
     r.close()
 
 def init(config, pv):

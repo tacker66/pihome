@@ -49,6 +49,7 @@ async def get_values():
         gc.collect()
         if test:
             print("get_values", gc.mem_free())
+            print(pv)
         await asyncio.sleep_ms(WAITTIME)
 
 async def show_fast_values():

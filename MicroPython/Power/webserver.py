@@ -12,7 +12,7 @@ def update(config, values):
     global index_html
     s = ""                       
     s = s + '\n<h3>APSystems EZ1</h3><table border="1">\n'
-    for value in sorted(values):
+    for value in sorted(values, reverse=True):
         s = s + '<tr><td align="right">' + str(value) + '</td>\n<td align="left">' + str(values[value]) + '</td></tr>\n'
     s = s + '</table>\n'
     s = _html_head + s + _html_tail

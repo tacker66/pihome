@@ -25,7 +25,6 @@ def update(config, pv):
         pv["POWER"]  = int(pv["POWER1"]) + int(pv["POWER2"])
         pv["ENERGY"] = random.randint(0, 1000)
         pv["ERROR"]  = 1 if random.randint(0, 9) < 4 else 0
-        print(pv)
     except Exception as e:
         print(e)
     
