@@ -55,23 +55,26 @@ ICO_BATTERY = 390
 _init = False
 
 def update(config, pv):
-    global _init
-    if not _init:
-        update_setting("TEFF", 10)
-        _init = True
-    icon = ICO_MOON
-    val = int(pv["POWER"])
-    if val >= int(config["CLOUDLEVEL"]):
-        icon = ICO_CLOUD
-    if val >= int(config["SUNNYLEVEL"]):
-        icon = ICO_SUNNY
-    if val >= int(config["SUNLEVEL"]):
-        icon = ICO_SUN
-    color = "#FF0000"
-    if int(pv["ERROR"]) == 0:
-        color = "#FFFFFF"
-    update_app("pvcur", str(val) + " W", icon, color)
-    update_app("pvsum", str(pv["ENERGY"]) + " kWh", ICO_BATTERY, color)
+    try:
+        global _init
+        if not _init:
+            update_setting("TEFF", 10)
+            _init = True
+        icon = ICO_MOON
+        val = int(pv["POWER"])
+        if val >= int(config["CLOUDLEVEL"]):
+            icon = ICO_CLOUD
+        if val >= int(config["SUNNYLEVEL"]):
+            icon = ICO_SUNNY
+        if val >= int(config["SUNLEVEL"]):
+            icon = ICO_SUN
+        color = "#FF0000"
+        if int(pv["ERROR"]) == 0:
+            color = "#FFFFFF"
+        update_app("pvcur", str(val) + " W", icon, color)
+        update_app("pvsum", str(pv["ENERGY"]) + " kWh", ICO_BATTERY, color)
+    except Exception as e:
+        print(e)
 
 if __name__=='__main__':
     import configs

@@ -18,13 +18,16 @@ def init(config, pv):
     _api = "http://" + config["PV"] + ":PORT/"
 
 def update(config, pv):
-    import random
-    pv["POWER1"] = random.randint(0, 400)
-    pv["POWER2"] = random.randint(0, 400)
-    pv["POWER"]  = int(pv["POWER1"]) + int(pv["POWER2"])
-    pv["ENERGY"] = random.randint(0, 1000)
-    pv["ERROR"]  = 1 if random.randint(0, 9) < 4 else 0
-    print(pv)
+    try:
+        import random
+        pv["POWER1"] = random.randint(0, 400)
+        pv["POWER2"] = random.randint(0, 400)
+        pv["POWER"]  = int(pv["POWER1"]) + int(pv["POWER2"])
+        pv["ENERGY"] = random.randint(0, 1000)
+        pv["ERROR"]  = 1 if random.randint(0, 9) < 4 else 0
+        print(pv)
+    except Exception as e:
+        print(e)
     
 if __name__=='__main__':
     import configs
