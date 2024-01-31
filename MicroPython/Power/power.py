@@ -10,7 +10,7 @@ import ez1
 import awtrix
 import led
 import webserver
-#import thingspeak
+import thingspeak
 
 # indicate wifi-not-connected status
 led.update(1)
@@ -101,8 +101,8 @@ async def main():
         start_webserver(),
         get_values(),
         show_fast_values(),
-        #show_slow_values(),
-        #send_values(),
+        show_slow_values(),
+        send_values(),
         check_wifi(),
         )
         
