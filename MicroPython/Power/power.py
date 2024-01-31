@@ -12,6 +12,9 @@ import led
 import webserver
 #import thingspeak
 
+# indicate wifi-not-connected status
+led.update(1)
+
 # update interval for external displays
 if test:
     SLOW_UPDTIME = 120_000

@@ -44,7 +44,6 @@ def update_app(name, text, icon=0, color="", save=False):
 def init(config, pv):
     global _api
     _api = "http://" + config["AWTRIX"] + "/api/"
-    update_setting("TEFF", 10)
 
 # from https://developer.lametric.com/icons
 ICO_MOON    = 12181
@@ -53,7 +52,13 @@ ICO_SUNNY   = 4973
 ICO_SUN     = 10350
 ICO_BATTERY = 390
 
+_init = False
+
 def update(config, pv):
+    global _init
+    if not _init:
+        update_setting("TEFF", 10)
+        _init = True
     icon = ICO_MOON
     val = int(pv["POWER"])
     if val >= int(config["CLOUDLEVEL"]):
