@@ -2,20 +2,39 @@
 # https://file.apsystemsema.com:8083/apsystems/apeasypower/resource/APsystems%20EZ1%20Local%20API%20User%20Manual.pdf
 
 import gc
+import json
 import requests
 
-_api = ""
+_api  = ""
+_port = "8050"
 
-def read_values(v):
+def init(config, pv=None):
+    global _api, _port
+    _api = "http://" + config["PV"] + ":" + _port + "/"
+
+def call_cmd(cmd):
+    print(cmd)
     gc.collect()
-    data = '{"' + setting + '": "' + str(value) + '"}'
-    r = requests.post(_api + 'settings', data=data)
-    print(r.text)
-    r.close()
+    ret = ""
+    try:
+        r = requests.get(cmd, timeout=10)
+        ret = r.text
+        r.close()
+    except:
+        pass
+    return ret
 
-def init(config, pv):
-    global _api
-    _api = "http://" + config["PV"] + ":PORT/"
+def read_info():
+    val = call_cmd(_api + 'getDeviceInfo')
+    print(val)
+    
+def read_values():
+    val = call_cmd(_api + 'getOutputData')
+    print(val)
+    
+def read_alarms():
+    val = call_cmd(_api + 'getAlarm')
+    print(val)
 
 def update(config, pv):
     try:
@@ -31,6 +50,7 @@ def update(config, pv):
 if __name__=='__main__':
     import configs
     config = configs.read_config('power.conf')
-    _api = "http://" + config["PV"] + ":PORT/"
-    #read_values()
-    print(gc.mem_free())
+    init(config)
+    read_info()
+    read_values()
+    read_alarms()
