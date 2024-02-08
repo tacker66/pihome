@@ -35,6 +35,8 @@ pv["POWER2"] = 0
 pv["POWER"]  = 0
 pv["ENERGY"] = 0
 pv["ERROR"]  = 0
+pv["ALARMS"] = ""
+pv["EXCEPT"] = ""
 
 ez1.init(config, pv)
 awtrix.init(config, pv)
