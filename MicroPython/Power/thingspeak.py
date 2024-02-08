@@ -13,29 +13,35 @@ url = ""
 last_time = 0
 telegrams = dict()
 
+last_stat = "-"
 def update(config, values):
-    global telegrams, url
+    global telegrams, url, last_stat
     if url == "":
         url = "{}?".format(config["URL"])
     name  = "pv"
     symbs = config["SYMB"].split()
     key   = config[config["{}.KEY".format(name)]]
+    stat  = name + " stat: "
     for symb in symbs:
         symbol = "{}.{}".format(name, symb)
         if symbol in config:
-            field = "field{}={};".format(config[symbol], values[symb])
-            val_key = "{}.{}.KEY".format(name, symb)
-            if val_key in config:
-                key = config[config[val_key]]
-            if key not in telegrams:
-                telegrams[key] = ""
-            telegrams[key] = "{}{}".format(telegrams[key], field)
-
+            if config[symbol] != "S":
+                field = "field{}={};".format(config[symbol], values[symb])
+                val_key = "{}.{}.KEY".format(name, symb)
+                if val_key in config:
+                    key = config[config[val_key]]
+                if key not in telegrams:
+                    telegrams[key] = ""
+                telegrams[key] = "{}{}".format(telegrams[key], field)
+            else:
+                stat = stat + values[symb] + " "
+    last_stat = stat
+    
 last_ret = "-"
 last_exc = "-"
 cnt_exc  = 0
 def format_status():
-    msg = "ret: " + last_ret + " cnt: " + str(cnt_exc) + " exc: " + last_exc
+    msg = "ret: " + last_ret + " cnt: " + str(cnt_exc) + " exc: " + last_exc  + " " + last_stat
     msg = msg.replace("\n", " ")
     msg = msg.replace("\t", " ")
     msg = msg.replace(" ", "%20")

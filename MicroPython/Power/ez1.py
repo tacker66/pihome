@@ -3,7 +3,7 @@
 
 import gc
 import json
-import myrequests as requests
+import myrequests
 
 _api  = ""
 _port = "8050"
@@ -19,7 +19,7 @@ def call_cmd(cmd):
     gc.collect()
     ret = ""
     try:
-        r = requests.get(cmd)
+        r = myrequests.get(cmd)
         ret = r.text
         r.close()
         _cnt_exc = 0
