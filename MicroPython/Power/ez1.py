@@ -17,9 +17,9 @@ _cnt_exc  = 0
 def call_cmd(cmd):
     global _last_exc, _cnt_exc
     gc.collect()
-    ret = ""
+    ret = "{}"
     try:
-        r = myrequests.get(cmd)
+        r = myrequests.get(cmd, timeout=10)
         ret = r.text
         r.close()
         _cnt_exc = 0
@@ -55,7 +55,9 @@ def update(config, pv):
     alarms = json.loads(alarms)
     if "data" in alarms:
         alarm = alarms["data"]
-        pv["ERROR"]  = int(alarm["og"]) + int(alarm["isce1"]) + int(alarm["isce2"]) + int(alarm["oe"]) 
+        pv["ERROR"] = int(alarm["og"]) + int(alarm["isce1"]) + int(alarm["isce2"]) + int(alarm["oe"])
+    else:
+        pv["ERROR"] = -1 # device offline
         
 if __name__=='__main__':
     import configs
