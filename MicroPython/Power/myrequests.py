@@ -17,6 +17,7 @@ class Response:
     def content(self):
         if self._cached is None:
             try:
+                #self._cached = self.raw.read()
                 self._cached = self.raw.recv(10000)
             finally:
                 self.raw.close()
