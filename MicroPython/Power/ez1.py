@@ -19,7 +19,7 @@ def call_cmd(cmd):
     gc.collect()
     ret = "{}"
     try:
-        r = myrequests.get(cmd, timeout=10)
+        r = myrequests.get(cmd, timeout=20)
         ret = r.text
         r.close()
         _cnt_exc = 0
@@ -43,21 +43,31 @@ def read_alarms():
 def update(config, pv):
     alarms = read_alarms()
     values = read_values()
-    pv["ALARMS"] = "alarms: " + alarms
-    pv["EXCEPT"] = "cnt: " + str(_cnt_exc) + " exc: " + _last_exc
-    values = json.loads(values)
+    pv["ALARMS"] = "pv alarms: " + alarms
+    pv["EXCEPT"] = "pv cnt: " + str(_cnt_exc) + " pv exc: " + _last_exc
+    try:
+        values = json.loads(values) # json might be corrupted due to incomplete read
+    except:
+        values = dict()
     if "data" in values:
         value = values["data"]
-        pv["POWER1"] = int(value["p1"])
-        pv["POWER2"] = int(value["p2"])
-        pv["POWER"]  = int(value["p1"] + value["p2"])
-        pv["ENERGY"] = int(value["te1"] + value["te2"])
-    alarms = json.loads(alarms)
+        if ("p1" in value) and ("p2" in value) and ("te1" in value) and ("te2" in value): # json might be incomplete due to incomplete read
+            pv["POWER1"] = int(value["p1"])
+            pv["POWER2"] = int(value["p2"])
+            pv["POWER"]  = int(value["p1"] + value["p2"])
+            pv["ENERGY"] = int(value["te1"] + value["te2"])
+    try:
+        alarms = json.loads(alarms) # json might be corrupted due to incomplete read
+    except:
+        alarms = dict()
     if "data" in alarms:
         alarm = alarms["data"]
-        pv["ERROR"] = int(alarm["og"]) + int(alarm["isce1"]) + int(alarm["isce2"]) + int(alarm["oe"])
+        if ("og" in alarm) and ("isce1" in alarm) and ("isce2" in alarm) and ("oe" in alarm): # json might be incomplete due to incomplete read
+            pv["ERROR"] = int(alarm["og"]) + int(alarm["isce1"]) + int(alarm["isce2"]) + int(alarm["oe"])
+        else:
+            pv["ERROR"] = -2 # incomplete data
     else:
-        pv["ERROR"] = -1 # device offline
+        pv["ERROR"] = -1 # device is offline or corrupt data
         
 if __name__=='__main__':
     import configs

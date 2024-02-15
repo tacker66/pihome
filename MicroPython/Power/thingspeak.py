@@ -21,7 +21,7 @@ def update(config, values):
     name  = "pv"
     symbs = config["SYMB"].split()
     key   = config[config["{}.KEY".format(name)]]
-    stat  = name + " stat: "
+    stat  = ""
     for symb in symbs:
         symbol = "{}.{}".format(name, symb)
         if symbol in config:
