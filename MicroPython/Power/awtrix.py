@@ -29,6 +29,8 @@ def update_app(name, text, icon=0, color="", save=False):
     gc.collect()
     data = '{"text": "' + text + '"'
     data = data + ', "textCase": 2'
+    data = data + ', "lifetime": 600'
+    data = data + ', "lifetimeMode": 1'
     if icon != 0:
         data = data + ', "icon": "' + str(icon) + '"' 
     if color != "":
@@ -45,7 +47,7 @@ def init(config, pv):
 
 # from https://developer.lametric.com/icons
 ICO_MOON    = 12181
-ICO_CLOUD   = 91
+ICO_CLOUD   = 1531
 ICO_SUNNY   = 4973
 ICO_SUN     = 10350
 ICO_BATTERY = 390
@@ -57,6 +59,8 @@ def update(config, pv):
         global _init
         if not _init:
             update_setting("TEFF", 10)
+            update_setting("TSPEED", 400)
+            update_setting("ATIME", 4)
             _init = True
         icon = ICO_MOON
         val = int(pv["POWER"])
