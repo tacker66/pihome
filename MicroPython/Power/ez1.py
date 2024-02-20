@@ -39,6 +39,10 @@ def read_values():
 def read_alarms():
     val = call_cmd(_api + 'getAlarm')
     return(val)
+    
+def read_maxpower():
+    val = call_cmd(_api + 'getMaxPower')
+    return(val)
 
 def update(config, pv):
     alarms = read_alarms()
@@ -76,3 +80,4 @@ if __name__=='__main__':
     print(read_info())
     print(read_values())
     print(read_alarms())
+    print(read_maxpower())
