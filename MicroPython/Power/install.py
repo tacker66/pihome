@@ -6,6 +6,7 @@
 # - run install.py
 # - set 'test = 0' in power.py
 # - restart your device
+# - add 'update_energy_per_year.matlab' in ThingSpeak as a MATLAB Analysis together with a TimeControl to calculate energy production per year
 #
 
 import mip

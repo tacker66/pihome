@@ -74,7 +74,7 @@ def update(config, pv):
         if int(pv["ERROR"]) == 0:
             color = "#FFFFFF"
         update_app("pvcur", str(val) + " W", icon, color)
-        update_app("pvsum", str(pv["ENERGY"]) + " kWh", ICO_BATTERY, color)
+        update_app("pvsum", str(pv["ENERGYYEAR"]) + " kWh", ICO_BATTERY, color)
     except Exception as e:
         print(e)
 

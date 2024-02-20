@@ -37,6 +37,7 @@ pv["ENERGY"] = 0
 pv["ERROR"]  = 0
 pv["ALARMS"] = ""
 pv["EXCEPT"] = ""
+pv["ENERGYYEAR"] = 0
 
 ez1.init(config, pv)
 awtrix.init(config, pv)
@@ -68,6 +69,7 @@ async def show_fast_values():
 async def show_slow_values():
     while True:
         await lock.acquire()
+        thingspeak.pre_update(config, pv)
         thingspeak.update(config, pv)
         lock.release()
         gc.collect()

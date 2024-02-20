@@ -4,6 +4,7 @@
 import gc
 import time
 import requests
+import json
 
 WAITTIME = 20   # thingspeak only allows ~8.200 messages per day so
                 # messages cannot be sent faster than every 10.6 seconds;
@@ -17,7 +18,7 @@ last_stat = "-"
 def update(config, values):
     global telegrams, url, last_stat
     if url == "":
-        url = "{}?".format(config["URL"])
+        url = "{}/update?".format(config["URL"])
     name  = "pv"
     symbs = config["SYMB"].split()
     key   = config[config["{}.KEY".format(name)]]
@@ -68,3 +69,26 @@ def send():
                 cnt_exc += 1
             telegrams[key] = ""
             last_time = cur_time
+
+urlr = ""
+def pre_update(config, values):
+    global urlr, last_exc, cnt_exc
+    if urlr == "":
+        urlr = "{}/channels/{}/feeds.json?api_key={}&results=20".format(config["URL"], config["CHAN"], config["KEYR"])
+    name  = "pv"
+    read_values = dict()
+    for value in values:
+        symbol = "{}.{}".format(name, value)
+        if (symbol in config) and ("R" in config[symbol]):
+            field = "field{}".format(config[symbol].replace("R", ""))
+            read_values[field] = value
+    try:
+        r = requests.get(urlr)
+        data = json.loads(r.text)
+        for read_value in read_values:
+            for feed in data["feeds"]:
+                if read_value in feed and feed[read_value] != None:
+                    values[read_values[read_value]] = int(feed[read_value])
+    except Exception as e:
+        last_exc = str(e)
+        cnt_exc += 1
