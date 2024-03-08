@@ -5,7 +5,6 @@
 channelID   =  xxxxxxxx; 
 readAPIKey  = 'xxxxxxxx'; 
 writeAPIKey = 'xxxxxxxx'; 
-
 test = 0;
 
 energyFieldID = 2;
@@ -24,7 +23,7 @@ data = thingSpeakRead(channelID,'Fields',[energyFieldID],'DateRange',[windowStar
 data = rmmissing(data);
 lastEnergy = 0;
 if length(data) > 0
-    lastEnergy = data(1);
+    lastEnergy = data(length(data));
 end
 lastTimestamp = windowStart;
 if test
@@ -40,7 +39,7 @@ end
 data = thingSpeakRead(channelID,'Fields',[energyFieldID],'DateRange',[windowStart,windowEnd],'ReadKey',readAPIKey);                                
 data = rmmissing(data);
 if length(data) > 0
-    firstEnergy = data(1);
+    firstEnergy = data(length(data));
     avgEnergy = lastEnergy - firstEnergy;
     if test
         fprintf(['first / avg energy: %d, %d / %d\n'], firstEnergy, avgEnergy);
