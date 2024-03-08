@@ -21,9 +21,9 @@ if test:
     FAST_UPDTIME = 20_000  # update interval for local displays
     WAITTIME     = 30_000  # time to next pv read
 else:
-    SLOW_UPDTIME = 600_000
-    FAST_UPDTIME = 60_000  # update interval for local displays
-    WAITTIME     = 300_000 # time to next pv read
+    SLOW_UPDTIME = 420_000
+    FAST_UPDTIME = 42_000  # update interval for local displays
+    WAITTIME     = 210_000 # time to next pv read
 SENDTIME    = 2_000   # trigger interval for re-sending telegrams to external displays
 WIFITIME    = 20_000  # wifi check interval
 
