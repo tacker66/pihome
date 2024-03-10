@@ -24,7 +24,7 @@ else:
     SLOW_UPDTIME = 420_000
     FAST_UPDTIME = 42_000  # update interval for local displays
     WAITTIME     = 210_000 # time to next pv read
-SENDTIME    = 2_000   # trigger interval for re-sending telegrams to external displays
+SENDTIME    = 20_000  # trigger interval for re-sending telegrams to external displays
 WIFITIME    = 20_000  # wifi check interval
 
 config = configs.read_config('power.conf')

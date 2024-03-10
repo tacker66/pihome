@@ -53,6 +53,7 @@ def send():
     cur_time = time.time()
     for key in telegrams:
         if len(telegrams[key]) > 0 and (cur_time - last_time) > WAITTIME:
+            success = True
             try:
                 telegram = "{}{}key={}".format(url, telegrams[key], key)
                 if "field8" not in telegram:
@@ -62,13 +63,16 @@ def send():
                 last_ret = r.text
                 if last_ret == "0": # too many telegrams
                     last_exc = last_ret
+                    success  = False
                 cnt_exc = 0
                 r.close() # this is important to avoid memory leaks!
             except Exception as e:
                 last_exc = str(e)
+                success  = False
                 cnt_exc += 1
-            telegrams[key] = ""
             last_time = cur_time
+            if success:
+                telegrams[key] = ""
 
 urlr = ""
 def pre_update(config, values):
