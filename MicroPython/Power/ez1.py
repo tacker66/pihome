@@ -44,29 +44,30 @@ def read_maxpower():
     val = call_cmd(_api + 'getMaxPower')
     return(val)
 
+# beware: json data might be incomplete due to "message"=="FAILURE" or incomplete read
 def update(config, pv):
     alarms = read_alarms()
     values = read_values()
-    pv["ALARMS"] = "pv alarms: " + alarms
-    pv["EXCEPT"] = "pv cnt: " + str(_cnt_exc) + " pv exc: " + _last_exc
+    pv["ALARMS"] = "pv: alarms: " + alarms
+    pv["EXCEPT"] = "pv: exc: " + str(_cnt_exc) + " " + _last_exc
     try:
-        values = json.loads(values) # json might be corrupted due to incomplete read
+        values = json.loads(values)
     except:
         values = dict()
     if "data" in values:
         value = values["data"]
-        if ("p1" in value) and ("p2" in value) and ("te1" in value) and ("te2" in value): # json might be incomplete due to incomplete read
+        if ("p1" in value) and ("p2" in value) and ("te1" in value) and ("te2" in value):
             pv["POWER1"] = int(value["p1"])
             pv["POWER2"] = int(value["p2"])
             pv["POWER"]  = int(value["p1"] + value["p2"])
             pv["ENERGY"] = int(value["te1"] + value["te2"])
     try:
-        alarms = json.loads(alarms) # json might be corrupted due to incomplete read
+        alarms = json.loads(alarms)
     except:
         alarms = dict()
     if "data" in alarms:
         alarm = alarms["data"]
-        if ("og" in alarm) and ("isce1" in alarm) and ("isce2" in alarm) and ("oe" in alarm): # json might be incomplete due to incomplete read
+        if ("og" in alarm) and ("isce1" in alarm) and ("isce2" in alarm) and ("oe" in alarm):
             pv["ERROR"] = int(alarm["og"]) + int(alarm["isce1"]) + int(alarm["isce2"]) + int(alarm["oe"])
         else:
             pv["ERROR"] = -2 # incomplete data

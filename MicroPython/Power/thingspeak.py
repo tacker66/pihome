@@ -42,7 +42,7 @@ last_ret = "-"
 last_exc = "-"
 cnt_exc  = 0
 def format_status():
-    msg = "ret: " + last_ret + " cnt: " + str(cnt_exc) + " exc: " + last_exc  + " " + last_stat
+    msg = "exc: " + str(cnt_exc) + " " + last_exc  + " " + last_stat
     msg = msg.replace("\n", " ")
     msg = msg.replace("\t", " ")
     msg = msg.replace(" ", "%20")
