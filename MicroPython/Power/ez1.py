@@ -60,7 +60,7 @@ def update(config, pv):
             pv["POWER1"] = int(value["p1"])
             pv["POWER2"] = int(value["p2"])
             pv["POWER"]  = int(value["p1"] + value["p2"])
-            pv["ENERGY"] = int(value["te1"] + value["te2"])
+            pv["ENERGY"] = round(value["te1"] + value["te2"], 2)
     try:
         alarms = json.loads(alarms)
     except:
