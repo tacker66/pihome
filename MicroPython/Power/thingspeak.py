@@ -50,6 +50,7 @@ def format_status():
 
 def send():
     global last_time, telegrams, url, last_ret, last_exc, cnt_exc
+    gc.collect()
     cur_time = time.time()
     for key in telegrams:
         if len(telegrams[key]) > 0 and (cur_time - last_time) > WAITTIME:
@@ -77,6 +78,7 @@ def send():
 urlr = ""
 def pre_update(config, values):
     global urlr, last_exc, cnt_exc
+    gc.collect()
     if urlr == "":
         urlr = "{}/channels/{}/feeds.json?api_key={}&results=20".format(config["URL"], config["CHAN"], config["KEYR"])
     name  = "pv"
