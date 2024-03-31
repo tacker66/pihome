@@ -95,6 +95,7 @@ def pre_update(config, values):
             for feed in data["feeds"]:
                 if read_value in feed and feed[read_value] != None:
                     values[read_values[read_value]] = int(feed[read_value])
+        r.close() # this is important to avoid memory leaks!
     except Exception as e:
         last_exc = str(e)
         cnt_exc += 1
