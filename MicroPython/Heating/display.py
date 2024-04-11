@@ -1,5 +1,5 @@
 
-test = 1
+test = 0
 
 from Pico_LCD_114_V2 import LCD_114 as LCD
 
