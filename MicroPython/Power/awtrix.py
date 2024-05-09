@@ -46,11 +46,12 @@ def init(config, pv):
     _api = "http://" + config["AWTRIX"] + "/api/"
 
 # from https://developer.lametric.com/icons
-ICO_MOON    = 12181
-ICO_CLOUD   = 1531
-ICO_SUNNY   = 4973
-ICO_SUN     = 10350
-ICO_BATTERY = 390
+ICO_MOON  = 12181
+ICO_CLOUD = 1531
+ICO_SUNNY = 4973
+ICO_SUN   = 10350
+ICO_MONTH = 8480
+ICO_YEAR  = 8481
 
 _init = False
 
@@ -73,8 +74,9 @@ def update(config, pv):
         color = "#FF0000"
         if int(pv["ERROR"]) == 0:
             color = "#FFFFFF"
-        update_app("pvcur", str(val) + " W", icon, color)
-        update_app("pvsum", str(pv["ENERGYYEAR"]) + " kWh", ICO_BATTERY, color)
+        update_app("pvcur",  str(int(val)) + " W", icon, color)
+        update_app("pvmonth",str(int(pv["ENERGYMONTH"])) + " kWh / Month", ICO_MONTH, color)
+        update_app("pvyear", str(int(pv["ENERGYYEAR"])) + " kWh / Year", ICO_YEAR, color)
     except Exception as e:
         print(e)
 

@@ -38,6 +38,7 @@ pv["ERROR"]  = 0
 pv["ALARMS"] = ""
 pv["EXCEPT"] = ""
 pv["ENERGYYEAR"] = 0
+pv["ENERGYMONTH"] = 0
 
 ez1.init(config, pv)
 awtrix.init(config, pv)
