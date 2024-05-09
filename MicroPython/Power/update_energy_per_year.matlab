@@ -41,13 +41,13 @@ data = thingSpeakRead(channelID,'Fields',[energyFieldID],'DateRange',[windowStar
 data = rmmissing(data);
 if length(data) > 0
     firstEnergy = data(length(data));
-    avgEnergy = int64(lastEnergy - firstEnergy);
+    avgEnergy = round(lastEnergy - firstEnergy, 2);
     if test
         fprintf(['first / avg energy: %d, %d / %d\n'], firstEnergy, avgEnergy);
     end
 else
     duration = days(lastTimestamp - firstEnergyStart);
-    avgEnergy = int64(365.0 * (lastEnergy - firstEnergy) / duration);
+    avgEnergy = round(365.0 * (lastEnergy - firstEnergy) / duration, 2);
     if test
         fprintf(['first/avg energy, duration: %d/%d, %s\n'], firstEnergy, avgEnergy, duration); 
     end
