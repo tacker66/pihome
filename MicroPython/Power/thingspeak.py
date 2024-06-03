@@ -66,11 +66,11 @@ def send():
                     last_exc = last_ret
                     success  = False
                 cnt_exc = 0
-                r.close() # this is important to avoid memory leaks!
             except Exception as e:
                 last_exc = str(e)
                 success  = False
                 cnt_exc += 1
+            r.close() # this is important to avoid memory leaks!
             last_time = cur_time
             if success:
                 telegrams[key] = ""
@@ -95,7 +95,7 @@ def pre_update(config, values):
             for feed in data["feeds"]:
                 if read_value in feed and feed[read_value] != None:
                     values[read_values[read_value]] = round(float(feed[read_value]), 2)
-        r.close() # this is important to avoid memory leaks!
     except Exception as e:
         last_exc = str(e)
         cnt_exc += 1
+    r.close() # this is important to avoid memory leaks!

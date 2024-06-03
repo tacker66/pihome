@@ -21,11 +21,11 @@ def call_cmd(cmd):
     try:
         r = myrequests.get(cmd, timeout=20)
         ret = r.text
-        r.close()
         _cnt_exc = 0
     except Exception as e:
         _last_exc = str(e)
         _cnt_exc += 1
+    r.close()
     return ret
 
 def read_info():

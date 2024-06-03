@@ -57,9 +57,9 @@ def send():
                 if last_ret == "0": # too many telegrams
                     last_exc = last_ret
                 cnt_exc = 0
-                r.close() # this is important to avoid memory leaks!
             except Exception as e:
                 last_exc = str(e)
                 cnt_exc += 1
+            r.close() # this is important to avoid memory leaks!
             telegrams[key] = ""
             last_time = cur_time
