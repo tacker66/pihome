@@ -22,10 +22,7 @@ def api_status():
 def update_setting(setting, value):
     gc.collect()
     data = '{"' + setting + '": "' + str(value) + '"}'
-    try:
-        r = requests.post(_api + 'settings', data=data)
-    except:
-        pass
+    r = requests.post(_api + 'settings', data=data)
     r.close()
 
 def update_app(name, text, icon=0, color="", save=False):
@@ -41,10 +38,7 @@ def update_app(name, text, icon=0, color="", save=False):
     if save:
         data = data + ', "save": true'
     data = data + '}'
-    try:
-        r = requests.post(_api + 'custom?name='+name, data=data)
-    except:
-        pass
+    r = requests.post(_api + 'custom?name='+name, data=data)
     r.close()
 
 def init(config, pv):
