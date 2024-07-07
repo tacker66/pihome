@@ -70,7 +70,9 @@ async def scan_devices():
                     print("unknown device", result.name(), device)   
                     
 values = dict()
+rssi_err_latency = 2 # number of scan cycles after a device is considered missing when no values could be read
 async def calc_values():
+    global rssi_err_latency
     for device in values:
         values[device]["RSSI"] = devices[device]["rssi"] # local error indicator
         if values[device]["RSSI"] == 0:
@@ -82,10 +84,20 @@ async def calc_values():
             data = devices[device]["manufacturer"].pop(0)
             if device not in values:
                 values[device] = dict()
-                values[device]["TMP"] = 0
-                values[device]["HUM"] = 0
-                values[device]["BAT"] = 0
-            values[device]["RSSI"] = devices[device]["rssi"]
+                values[device]["TMP"]       = 0
+                values[device]["HUM"]       = 0
+                values[device]["BAT"]       = 0
+                values[device]["RSSI"]      = 0
+                values[device]["RSSI_LAST"] = 0
+                values[device]["RSSI_ERR"]  = 0
+            rssi = devices[device]["rssi"]
+            values[device]["RSSI_LAST"] = rssi
+            if rssi == 0:
+                values[device]["RSSI_ERR"] += 1
+            else:
+                values[device]["RSSI_ERR"] = 0
+            if rssi != 0 or values[device]["RSSI_ERR"] > rssi_err_latency:
+                values[device]["RSSI"] = rssi
             if thermobeacon.can_decode(mid, data):
                 tmp, hum, bat = thermobeacon.decode(mid, data)
                 off = "{}.TMP.OFF".format(name)
