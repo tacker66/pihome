@@ -60,7 +60,7 @@ def update(config, values):
         errorlevel = 0
         if rssi == 0:
             errorlevel = 2
-        if tmp <= 0.0:
+        if tmp < 0.0:
             errorlevel = 3
         _display(pos, name, msg, errorlevel)
         if test:
