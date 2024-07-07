@@ -15,6 +15,11 @@ last_time = 0
 telegrams = dict()
 
 last_stat = "-"
+last_ret   = "-"
+last_exc   = "-"
+cnt_exc    = 0
+cnt_enomem = 0
+
 def update(config, values):
     global telegrams, url, last_stat
     if url == "":
@@ -38,18 +43,15 @@ def update(config, values):
                 stat = stat + values[symb] + " "
     last_stat = stat
     
-last_ret = "-"
-last_exc = "-"
-cnt_exc  = 0
 def format_status():
-    msg = "exc: " + str(cnt_exc) + " " + last_exc  + " " + last_stat
+    msg = "exc: " + str(cnt_exc) + " " + last_exc  + " " + str(cnt_enomem) + " ENOMEM " + last_stat
     msg = msg.replace("\n", " ")
     msg = msg.replace("\t", " ")
     msg = msg.replace(" ", "%20")
     return msg
 
 def send():
-    global last_time, telegrams, url, last_ret, last_exc, cnt_exc
+    global last_time, telegrams, url, last_ret, last_exc, cnt_exc, cnt_enomem
     gc.collect()
     cur_time = time.time()
     for key in telegrams:
@@ -71,6 +73,8 @@ def send():
                 last_exc = str(e)
                 success  = False
                 cnt_exc += 1
+                if e == MemoryError:
+                    cnt_enomem += 1
             last_time = cur_time
             if success:
                 telegrams[key] = ""
