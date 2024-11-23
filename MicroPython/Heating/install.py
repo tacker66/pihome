@@ -18,6 +18,10 @@
 # - restart your device
 #
 
+
+import micropython
+micropython.opt_level(3)
+
 import time
 import network
 

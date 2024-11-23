@@ -60,6 +60,7 @@ def send():
                 if "field8" not in telegram and debuginfos[key] == 1:
                     telegram = "{};field8={:d}".format(telegram, gc.mem_free())
                     telegram = "{};status={}".format(telegram, format_status())
+                gc.collect()
                 r = requests.post(telegram)
                 last_ret = r.text
                 if last_ret == "0": # too many telegrams

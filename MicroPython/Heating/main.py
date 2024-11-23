@@ -1,4 +1,7 @@
 
+import micropython
+micropython.opt_level(3)
+
 test = 0
 
 if test:
