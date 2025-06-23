@@ -9,10 +9,11 @@ _start_y   = 0
 _height    = 10
 
 def init(config):
-    global _lcd, _lcd_width, _lcd_height
-    _lcd_height= int(config["display_entries"]) * (_height + 1) * 2
-    _lcd_width = int(config["display_width"]) + _start_y
-    _lcd = LCD(width=_lcd_width, height=_lcd_height)
+    global _lcd, _lcd_width, _lcd_height, _battery_low
+    _lcd_height  = int(config["display_entries"]) * (_height + 1) * 2
+    _lcd_width   = int(config["display_width"]) + _start_y
+    _lcd         = LCD(width=_lcd_width, height=_lcd_height)
+    _battery_low = float(config["battery_low"])
 
 def _display(pos, label, msg, errorlevel=0):
     pos = (pos % _num_pos) * 2
@@ -58,6 +59,8 @@ def update(config, values):
         if dname in config:
             name = config[dname]
         errorlevel = 0
+        if float(bat) < _battery_low:
+            errorlevel = 1 
         if rssi == 0:
             errorlevel = 2
         if tmp < 0.0:
