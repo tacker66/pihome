@@ -6,7 +6,6 @@ use_webserver = 1
 
 import gc
 import asyncio
-import bluetooth
 import aioble
 
 import wifi
