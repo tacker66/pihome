@@ -69,13 +69,9 @@ async def scan_devices():
                     print("unknown device", result.name(), device)   
                     
 values = dict()
-rssi_err_latency = 2 # number of scan cycles after a device is considered missing when no values could be read
+rssi_err_latency = 4 # number of scan cycles after a device is considered missing when no values could be read
 async def calc_values():
     global rssi_err_latency
-    for device in values:
-        values[device]["RSSI"] = devices[device]["rssi"] # local error indicator
-        if values[device]["RSSI"] == 0:
-            values[device]["BAT"] = 0 # external error indicator
     for device in devices:
         name = config[device]
         mid  = devices[device]["manufacturer_id"]
