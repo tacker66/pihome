@@ -8,6 +8,10 @@ import gc
 import asyncio
 import aioble
 
+import time
+import ntptime
+import machine
+
 import wifi
 import thingspeak
 import thermobeacon
@@ -161,9 +165,20 @@ async def check_wifi():
         else:
             display.update_border(errorlevel=0)
         await asyncio.sleep_ms(WIFITIME)
+
+current_day = 0
+async def autoreset():
+    while True:
+        day = time.localtime()[2]
+        if day != current_day:
+            machine.reset()
+        await asyncio.sleep_ms(SLOW_UPDTIME)
     
 async def main():
     wifi.connect(config["SSID"], config["PASS"])
+    ntptime.settime()
+    global current_day
+    current_day = time.localtime()[2]
     gc.collect()
     if test:
         print("main", gc.mem_free())
@@ -175,12 +190,14 @@ async def main():
             show_slow_values(),
             send_values(),
             check_wifi(),
+            autoreset()
             )
     else:
         await asyncio.gather(
             get_values(),
             show_values(),
             send_values(),
+            autoreset()
             )
         
 asyncio.run(main())
