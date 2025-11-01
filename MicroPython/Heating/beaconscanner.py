@@ -83,6 +83,7 @@ async def calc_values():
             data = devices[device]["manufacturer"].pop(0)
             if device not in values:
                 values[device] = dict()
+                values[device]["INIT"]      = False
                 values[device]["TMP"]       = 0
                 values[device]["HUM"]       = 0
                 values[device]["BAT"]       = 0
@@ -105,9 +106,10 @@ async def calc_values():
                 off = "{}.HUM.OFF".format(name)
                 if off in config:
                     hum = hum + float(config[off])
-                values[device]["TMP"] = tmp
-                values[device]["HUM"] = hum
-                values[device]["BAT"] = bat
+                values[device]["INIT"] = True
+                values[device]["TMP"]  = tmp
+                values[device]["HUM"]  = hum
+                values[device]["BAT"]  = bat
 
 async def get_values():
     while True:

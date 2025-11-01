@@ -19,6 +19,8 @@ def update(config, values):
     if url == "":
         url = "{}?".format(config["URL"])
     for device in values:
+        if values[device]["INIT"] == False:
+            continue
         name     = config[device]
         symbs    = config["SYMB"].split()
         key_name = config["{}.KEY".format(name)]
