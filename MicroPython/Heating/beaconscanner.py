@@ -168,14 +168,11 @@ async def check_wifi():
             display.update_border(errorlevel=0)
         await asyncio.sleep_ms(WIFITIME)
 
-current_day = 0
-async def autoreset():
-    while True:
-        day = time.localtime()[2]
-        if day != current_day:
-            machine.reset()
-        await asyncio.sleep_ms(SLOW_UPDTIME)
-    
+def timer_cb(timer):
+    machine.reset()
+
+timer = machine.Timer(mode=machine.Timer.ONE_SHOT, period=24*60*60_000, callback=timer_cb, hard=True)
+
 async def main():
     wifi.connect(config["SSID"], config["PASS"])
     ntptime.settime()
@@ -191,15 +188,13 @@ async def main():
             show_fast_values(),
             show_slow_values(),
             send_values(),
-            check_wifi(),
-            autoreset()
+            check_wifi()
             )
     else:
         await asyncio.gather(
             get_values(),
             show_values(),
-            send_values(),
-            autoreset()
+            send_values()
             )
         
 asyncio.run(main())
