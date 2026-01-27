@@ -7,9 +7,6 @@ use_webserver = 1
 import gc
 import asyncio
 import aioble
-
-import time
-import ntptime
 import machine
 
 import wifi
@@ -175,9 +172,6 @@ timer = machine.Timer(mode=machine.Timer.ONE_SHOT, period=24*60*60_000, callback
 
 async def main():
     wifi.connect(config["SSID"], config["PASS"])
-    ntptime.settime()
-    global current_day
-    current_day = time.localtime()[2]
     gc.collect()
     if test:
         print("main", gc.mem_free())
