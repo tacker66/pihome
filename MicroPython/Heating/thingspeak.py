@@ -28,7 +28,7 @@ def update(config, values):
         for symb in symbs:
             symbol = "{}.{}".format(name, symb)
             if symbol in config:
-                field = "field{}={};".format(config[symbol], values[device][symb])
+                field = "field{}={}&".format(config[symbol], values[device][symb])
                 value_key_name = "{}.{}.KEY".format(name, symb)
                 if value_key_name in config:
                     key_name = config[value_key_name]
@@ -58,10 +58,10 @@ def send():
     for key in telegrams:
         if len(telegrams[key]) > 0 and (cur_time - last_time) > WAITTIME:
             try:
-                telegram = "{}{}key={}".format(url, telegrams[key], key)
+                telegram = "{}{}api_key={}".format(url, telegrams[key], key)
                 if "field8" not in telegram and debuginfos[key] == 1:
-                    telegram = "{};field8={:d}".format(telegram, gc.mem_free())
-                    telegram = "{};status={}".format(telegram, format_status())
+                    telegram = "{}&field8={:d}".format(telegram, gc.mem_free())
+                    telegram = "{}&status={}".format(telegram, format_status())
                 gc.collect()
                 r = requests.post(telegram)
                 last_ret = r.text
